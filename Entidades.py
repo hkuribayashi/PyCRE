@@ -1,5 +1,7 @@
-import main
+class BS:
 
-p = main.SBS("Higo", 23, 23)
+    def __init__(self, tipo, potencia, ponto):
+        self.tipo = tipo
+        self.potencia = potencia
+        self.ponto = ponto
 
-p.__imprimir__()
