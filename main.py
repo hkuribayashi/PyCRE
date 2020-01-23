@@ -1,1 +1,3 @@
-print("Hugo")
+variavel = 1
+
+print(variavel)
