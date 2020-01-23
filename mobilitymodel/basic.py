@@ -9,6 +9,9 @@ class Point:
     def get_distance(self, point):
         return ((self.x - point.x)**2 + (self.y - point.y)**2 + (self.z - point.z)**2)**(0.5)
 
+    def __str__(self):
+        return '[x={}, y={}, z={}]'.format(self.x, self.y, self.z)
+
 class ApplicationProfile(enum.Enum):
     virtual_reality = {'latency': 10.0, 'bandwidth': 100.0, 'compression_factor': 0.6}
     factory_automation = {'latency': 20.0, 'bandwidth': 1.0, 'compression_factor': 0.8}

@@ -20,7 +20,7 @@ class BS:
 
 class UE:
 
-    def __init__(self, point, bitrate_per_channel=0.0, resource_blocks=0):
+    def __init__(self, point, profile, bitrate_per_channel=0.0, resource_blocks=0):
         self.point = point
         self.bitrate_per_channel = bitrate_per_channel
         self.resource_blocks = resource_blocks
@@ -69,7 +69,7 @@ class HetNet:
 
 
     def print(self):
-        print(self.ue)
+        print(self.ue[-1].point)
         print(self.bs)
 
 tiers_density = {'UE': 0.000002, 'MBS': 0.000002, 'SBS-1': 0.000002, 'SBS-2': 0.000002}
