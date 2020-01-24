@@ -2,12 +2,13 @@ import enum
 import numpy as np
 
 from builtins import RuntimeError
-from mobilitymodel.basic import get_hppp
+from mobilitymodel.basic import get_hppp, Point
 
 
 class BS:
 
-    def __init__(self, point, power, tx_gain, rx_gain, tier, online=True, load=0, resource_blocks=100):
+    def __init__(self, type, point, power, tx_gain, rx_gain, tier, online=True, load=0, resource_blocks=100):
+        self.type = type
         self.power = power
         self.point = point
         self.tx_gain = tx_gain
@@ -52,34 +53,43 @@ class NetworkElement:
         self.coverage_status = coverage_status
         self.distance = distance
 
+    def __str__(self):
+        return 'Network Element: sinr={}'.format(self.sinr)
+
 
 class HetNet:
 
-    def __init__(self, simulation_area, tier_density):
+    def __init__(self, simulation_area, tier_density, user_density, bandwidth=20000):
         self.ue = []
         self.bs = []
+        self.bias = [0]
+        self.bandwidth = bandwidth
         self.simulation_area = simulation_area
         self.tier_density = tier_density
+        self.user_density = user_density
 
-        if len(self.tier_density) != 4:
-            raise RuntimeError('HetNet tiers should be equal 4')
+        if len(self.tier_density) == 2:
+            raise RuntimeError('HetNet tiers should be equal 2')
 
         ue_points = get_hppp(self.tier_density['UE'], self.simulation_area, 1.5)
         for point in ue_points:
             profile = np.random.choice(list(ApplicationProfile))
             self.ue.append(UE(point, profile))
 
-        macro_points = get_hppp(self.tier_density['MBS'], self.simulation_area, 30.0)
-        for point in macro_points:
-            self.bs.append(BS(point, 46.0, 0.0, 0.0, 'MBS'))
+        p1 = Point(200.0, 200.0, 30.0)
+        p2 = Point(800.0, 800.0, 30.0)
+        self.bs.append(BS('MBS', p1, 46.0, 0.0, 0.0, 'MBS'))
+        self.bs.append(BS('MBS', p2, 46.0, 0.0, 0.0, 'MBS'))
 
         small_points = get_hppp(self.tier_density['SBS-1'], self.simulation_area, 10.0)
         for point in small_points:
-            self.bs.append(BS(point, 30.0, 0.0, 0.0, 'SBS-1'))
+            self.bs.append(BS('SBS', point, 30.0, 0.0, 0.0, 'SBS-1'))
 
         small_points = get_hppp(self.tier_density['SBS-2'], self.simulation_area, 1.0)
         for point in small_points:
-            self.bs.append(BS(point, 23.0, 0.0, 0.0, 'SBS-2'))
+            self.bs.append(BS('SBS', point, 23.0, 0.0, 0.0, 'SBS-2'))
+
+        self.bias = [0] * len(self.bs)
 
         for u in self.ue:
             for b in self.bs:
@@ -88,5 +98,31 @@ class HetNet:
                 u.ne.append(n)
                 b.ne.append(u)
 
+
+    def get_pathloss(self, type, distance, tx_gain):
+        if type == 'MBS':
+            pathloss = 128.1 + (37.6 * np.log10((max(distance, 35.0)/1000.0))) - tx_gain;
+        else: pathloss = 140.7 + (36.7 * np.log10((max(distance, 10.0)/1000.0))) - tx_gain;
+
+        return pathloss
+
+
+    def get_sinr(self):
+        bw = self.bandwidth * (10**6)
+        sigma = (10.0**(-3.0)) * (10**(-174.0/10))
+        total_thermal_noise = bw * sigma
+        for u in self.ue:
+            for n in u.ne:
+                n.sinr = n.bs.power - self.get_pathloss(n.bs.type, n.distance, n.bs.tx_gain)
+                n.sinr = (10 ** (-3.0)) * (10 ** (n.sinr/10.0))
+                aux = [ x for x in u.ne if x != n]
+                interference = 0.0
+                for k in aux:
+                    i = k.bs.power - self.get_pathloss(k.bs.type, k.distance, k.bs.tx_gain)
+                    interference += ((10**(-3.0)) * (10**(i/10.0)))
+                n.sinr = n.sinr/(interference + total_thermal_noise)
+                n.sinr = 10.0 * np.log10(n.sinr)
+
+
     def __str__(self):
-        return 'HetNet '
+        return 'HetNet: Tiers={}, Simulation Ares={}'.format(len(self.tier_density), self.simulation_area)
