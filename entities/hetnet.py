@@ -1,8 +1,9 @@
+import enum
 import numpy as np
 
-from mobilitymodel.basic import ApplicationProfile
-from utils.teste import get_hppp
 from builtins import RuntimeError
+from mobilitymodel.basic import get_hppp
+
 
 class BS:
 
@@ -15,7 +16,18 @@ class BS:
         self.load = load
         self.tier = tier
         self.resouce_blocks = resource_blocks
-        self.ues = []
+        self.ne = []
+
+
+class ApplicationProfile(enum.Enum):
+    virtual_reality = {'latency': 10.0, 'bandwidth': 100.0, 'compression_factor': 0.6}
+    factory_automation = {'latency': 20.0, 'bandwidth': 1.0, 'compression_factor': 0.8}
+    data_backup = {'latency': 1000.0, 'bandwidth': 1.0, 'compression_factor': 0.8}
+    smart_grid = {'latency': 5.0, 'bandwidth': 0.4, 'compression_factor': 0.03}
+    smart_home = {'latency': 60.0, 'bandwidth': 0.001, 'compression_factor': 1.0}
+    medical = {'latency': 40.0, 'bandwidth': 0.2, 'compression_factor': 0.2}
+    environmental_monitoring = {'latency': 1000.0, 'bandwidth': 1.0, 'compression_factor': 0.1}
+    tactile_internet = {'latency': 1.0, 'bandwidth': 120.0, 'compression_factor': 0.8}
 
 
 class UE:
@@ -25,18 +37,20 @@ class UE:
         self.bitrate_per_channel = bitrate_per_channel
         self.resource_blocks = resource_blocks
         self.profile = profile
-        self.bs = []
+        self.ne = []
 
 
 class NetworkElement:
 
-    def __init__(self, ue, bs, sinr, delay, efficiency=0.15, coverage_status=False):
+    def __init__(self, ue, bs, distance=0.0, sinr=0.0, delay=0.0, efficiency=0.15, coverage_status=False):
         self.ue = ue
         self.bs = bs
         self.sinr = sinr
+        self.distance = distance
         self.delay = delay
         self.efficiency = efficiency
         self.coverage_status = coverage_status
+        self.distance = distance
 
 
 class HetNet:
@@ -47,8 +61,8 @@ class HetNet:
         self.simulation_area = simulation_area
         self.tier_density = tier_density
 
-        if (len(self.tier_density) < 2):
-            raise RuntimeError('HetNet tiers should greater or equal than 2')
+        if len(self.tier_density) != 4:
+            raise RuntimeError('HetNet tiers should be equal 4')
 
         ue_points = get_hppp(self.tier_density['UE'], self.simulation_area, 1.5)
         for point in ue_points:
@@ -67,11 +81,12 @@ class HetNet:
         for point in small_points:
             self.bs.append(BS(point, 23.0, 0.0, 0.0, 'SBS-2'))
 
+        for u in self.ue:
+            for b in self.bs:
+                n = NetworkElement(u, b)
+                n.distance = u.point.get_distance(b.point)
+                u.ne.append(n)
+                b.ne.append(u)
 
-    def print(self):
-        print(self.ue[-1].point)
-        print(self.bs)
-
-tiers_density = {'UE': 0.000002, 'MBS': 0.000002, 'SBS-1': 0.000002, 'SBS-2': 0.000002}
-hn = HetNet(1000000.0, tiers_density)
-hn.print()
+    def __str__(self):
+        return 'HetNet '

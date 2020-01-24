@@ -1,15 +1,7 @@
-class BS(object):
-
-    def __init__(self, nome, idade):
-        self.nome = nome
-        self.idade = idade
-
-    def __imprimir__(self):
-        print('A idade de {} é {}'.format(self.nome, self.idade))
+from entities.hetnet import HetNet
 
 
-class SBS(BS):
+tiers_density = {'UE': 0.000002, 'MBS': 0.000002, 'SBS-1': 0.000002, 'SBS-2': 0.000002}
+hn = HetNet(1000000.0, tiers_density)
 
-    def __init__(self, nome, idade, potencia):
-        BS.__init__(self, nome, idade)
-        self.potencia = potencia
+print(hn.ue[0].profile.value['latency'])
