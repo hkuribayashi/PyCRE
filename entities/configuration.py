@@ -192,7 +192,10 @@ class Configuration:
             raise RuntimeError('[ERROR]: The subframe_duration parameter should be a positive value')
         else: self._subframe_duration = subframe_duration
 
+    def __str__(self) -> str:
+        return 'A'
+
 
 c = Configuration(0.01)
-print(c.user_density)
+print(c)
 
