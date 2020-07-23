@@ -4,6 +4,7 @@ from operator import attrgetter
 import numpy as np
 
 from network.ne import NetworkElement
+from utils.charts import get_visual
 from utils.misc import get_pathloss, get_efficiency
 
 
@@ -55,6 +56,9 @@ class HetNet:
 
         # Compute UE Data Rate
         self.__get_ue_datarate()
+
+        # Visualização da Hetnet
+        get_visual(self)
 
     def __get_sinr(self):
         bw = self.env.bandwidth * (10**6)
