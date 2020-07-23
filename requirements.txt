@@ -1,0 +1,5 @@
+#
+####### requirements.txt #######
+#
+numpy~=1.19.1
+matplotlib~=3.3.0

@@ -7,9 +7,6 @@ class Point:
         self.y = y
         self.z = z
 
-    def get_distance(self, point):
-        return ((self.x - point.x) ** 2 + (self.y - point.y) ** 2 + (self.z - point.z) ** 2) ** (0.5)
-
     def __str__(self):
         return '[x={}, y={}, z={}]'.format(self.x, self.y, self.z)
 
