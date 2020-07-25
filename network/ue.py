@@ -6,9 +6,20 @@ class UE:
     def __init__(self, id_, point):
         self.id = id_
         self.point = point
-        self.bitrate = 0.0
+        self.datarate = 0.0
         self.resource_blocks = 0.0
         self.profile = ApplicationProfile.DATA_BACKUP
+        self._evaluation = False
+
+    @property
+    def evaluation(self):
+        if self.datarate >= self.profile.datarate:
+            self._evaluation = True
+        return self._evaluation
+
+    @evaluation.setter
+    def evaluation(self, value):
+        self._evaluation = value
 
     def __str__(self):
-        return 'UE id={}, profile={}'.format(self.id, self.profile)
+        return 'UE id={}, bitrate={}, profile={}'.format(self.id, self.datarate, self.profile)

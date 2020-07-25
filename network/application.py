@@ -5,7 +5,7 @@ class ApplicationProfile(Enum):
 
     VIRTUAL_REALITY = (1.0, 100.0, 0.6)
     FACTORY_AUTOMATION = (2.0, 1.0, 0.8)
-    DATA_BACKUP = (3.0, 1.0, 0.8)
+    DATA_BACKUP = (3.0, 2.0, 0.8)
     SMART_GRID = (4.0, 0.4, 0.03)
     SMART_HOME = (5.0, 0.001, 1.0)
     MEDICAL = (6.0, 0.2, 0.2)
