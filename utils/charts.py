@@ -1,10 +1,19 @@
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 
 
 def get_visual(hetnet):
+
+    # Legend
+    legend_elements = [Line2D([0], [0], marker='o', color='w', label='MBS', markerfacecolor='b', markersize=10),
+                       Line2D([0], [0], marker='o', color='w', label='SBS', markerfacecolor='g', markersize=10),
+                       Line2D([0], [0], marker='o', color='w', label='UE', markerfacecolor='r', markersize=10)]
+
     # Create figure
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
+    ax.legend(handles=legend_elements, loc='best')
 
     plt.xlim(-105, 105)
     plt.ylim(-105, 105)
@@ -27,7 +36,10 @@ def get_visual(hetnet):
 
     for bs in hetnet.list_bs:
         p = (bs.point.x, bs.point.y)
-        ue_circle = plt.Circle(p, 1.5, color="blue", zorder=10)
+        if bs.type == 'MBS':
+            ue_circle = plt.Circle(p, 3.5, color="blue", zorder=10)
+        else:
+            ue_circle = plt.Circle(p, 2.5, color="green", zorder=10)
         ax.add_patch(ue_circle)
 
     plt.show()
