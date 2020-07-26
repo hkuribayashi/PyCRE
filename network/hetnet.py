@@ -49,6 +49,7 @@ class HetNet:
 
             # Compute SINR
             self.__get_sinr()
+
         else:
             self.__reset()
 
@@ -63,9 +64,6 @@ class HetNet:
 
         # Compute Performance Evaluation
         self.__get_metrics()
-
-        # Visualização da Hetnet
-        get_visual(self)
 
     def __get_sinr(self):
         bw = self.env.bandwidth * (10**6)
@@ -132,3 +130,6 @@ class HetNet:
                 ne.bs.load = 0.0
                 ne.ue.evaluation = False
 
+    def debug(self):
+        get_visual(self)
+        print(self.evaluation)

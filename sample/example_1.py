@@ -7,6 +7,9 @@ from network.hetnet import HetNet
 from network.ue import UE
 
 # Instantiate a Hetnet using Default Configs
+from rl.env import Environment
+from rl.agent import Agent
+
 h = HetNet(Configuration.DEFAULT)
 
 # Deploy a MBS
@@ -37,27 +40,24 @@ h.add_bs(sbs_3)
 h.add_bs(sbs_4)
 
 # Deploy 20 UEs
-for i in range(20):
+for i in range(50):
+    x = np.random.randint(-60, 60)
+    y = np.random.randint(-60, 60)
+    p_i = Point(x, y, 5.0)
+    ue = UE(i, p_i)
+    h.add_ue(ue)
+
+for i in range(50, 90):
     x = np.random.randint(-100, 100)
     y = np.random.randint(-100, 100)
     p_i = Point(x, y, 5.0)
     ue = UE(i, p_i)
     h.add_ue(ue)
 
-# Run de Hetnet
 h.run()
+h.debug()
 
-# Print de Evaluation Metrics
-print('Evaluation: {}'.format(h.evaluation))
-
-# Agents's Actions
-sbs_1.increase_bias()
-sbs_2.decrease_bias()
-sbs_3.maintain_bias()
-sbs_4.increase_bias()
-
-# Re-Run de Hetnet
-h.run()
-
-# Print de Evaluation Metrics
-print('Evaluation: {}'.format(h.evaluation))
+env = Environment(h)
+a = Agent(env)
+a.run()
+a.get_metrics()

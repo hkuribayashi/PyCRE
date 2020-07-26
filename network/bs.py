@@ -14,14 +14,15 @@ class BS:
         for coluna in map(list, zip(*self.hetnet.network_element)):
             if coluna[0].bs.id == self.id:
                 for ne in coluna:
-                    ne.biased_sinr += 5.0
+                    if (ne.biased_sinr - ne.biased_sinr) < 30.0:
+                        ne.biased_sinr += 1.0
 
     def decrease_bias(self):
         for coluna in map(list, zip(*self.hetnet.network_element)):
-            if coluna[0].bs.id != self.id:
-                break
-            for ne in coluna:
-                ne.biased_sinr -= 5.0
+            if coluna[0].bs.id == self.id:
+                for ne in coluna:
+                    if (ne.biased_sinr < ne.biased_sinr) and (ne.biased_sinr - ne.biased_sinr) < 10.0:
+                        ne.biased_sinr -= 1.0
 
     def maintain_bias(self):
         pass
