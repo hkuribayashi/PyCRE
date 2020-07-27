@@ -16,7 +16,6 @@ mbs = BS(1, 'MBS', p1)
 p2 = Point(50.0, 50.0, 5.0)
 sbs_1 = BS(2, 'SBS', p2)
 
-
 # Add each BS in the Hetnet
 h.add_bs(mbs)
 h.add_bs(sbs_1)
@@ -31,26 +30,15 @@ for i in range(5):
 
 h.run()
 
+# Passo 1: SINR 5 Usuários (linha) x 2 BS (colunas)
+# Passo 2: User Association
+# Passo 3: BS Load: MBS = 9, SBS = 1
+# Passo 4: RBs: MBS (100) = 100/9 = 10, SBS (100) = 100/1
+# Passo 5: Datarate Data-rate (Qtd de RBs de cada UE, SINR, Modulação)
+
+h.debug()
+# +20.0 dB -> Limite: Max 80.0 dB
+sbs_1.increase_bias()
+
+# -5.0 dB -> Limite: Min -10.0 dB
 sbs_1.decrease_bias()
-h.run()
-
-sbs_1.decrease_bias()
-h.run()
-
-sbs_1.decrease_bias()
-h.run()
-
-sbs_1.increase_bias()
-h.run()
-
-sbs_1.increase_bias()
-h.run()
-
-sbs_1.increase_bias()
-h.run()
-
-sbs_1.increase_bias()
-h.run()
-
-sbs_1.increase_bias()
-h.run()

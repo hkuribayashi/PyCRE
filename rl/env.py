@@ -44,7 +44,6 @@ class Environment:
             bs_0.increase_bias()
         else:
             bs_0.decrease_bias()
-
         self.hetnet.run()
 
         if int(self.hetnet.evaluation['satisfaction']) >= 90:

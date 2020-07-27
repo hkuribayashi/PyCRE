@@ -10,7 +10,7 @@ class Agent:
         # self.env = gym.make("FrozenLake-v0")
         self.env = env
 
-        # Espaço de Acoes: 3 (aumentar, diminuir ou manter)
+        # Espaço de Acoes: 2 (aumentar ou diminuir)
         self.action_space_size = env.action_space.n
 
         # Espaco de Estados: 10
@@ -30,7 +30,6 @@ class Agent:
         self.exploration_decay_rate = 0.001
 
         self.rewards_all_episodes = []
-        self.ues_atendidos_all_episodes = []
 
     def run(self):
         # Q-learning algorithm
@@ -57,6 +56,9 @@ class Agent:
                                          self.learning_rate * (reward + self.discount_rate * np.max(self.q_table[new_state, :]))
 
                 # Set new state
+                if state != new_state:
+                    print('state: {}'.format(state))
+                    print('new_state: {}'.format(new_state))
                 state = new_state
 
                 # Add new reward
@@ -80,16 +82,3 @@ class Agent:
             # Add current episode reward to total rewards list
             self.rewards_all_episodes.append(rewards_current_episode)
 
-    def get_metrics(self):
-
-        # Calculate and print the average reward per ten episodes
-        rewards_per_thousand_episodes = np.split(np.array(self.rewards_all_episodes),self.num_episodes/10)
-        ues_per_thousand_episodes = np.split(np.array(self.ues_atendidos_all_episodes), self.num_episodes / 10)
-        count = 10
-
-        print("********Average reward per thousand episodes********\n")
-        for r in ues_per_thousand_episodes:
-            print(count, ": ", str(sum(r/1000)))
-            count += 10
-        print('Debug')
-        print(self.q_table)
