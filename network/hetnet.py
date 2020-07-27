@@ -72,12 +72,12 @@ class HetNet:
 
         for linha in self.network_element:
             for element in linha:
-                element.sinr = element.bs.power - get_pathloss(element.bs.type, element.distance, element.bs.tx_gain)
+                element.sinr = element.bs.power - get_pathloss(element.bs.type, element.distance) + element.bs.tx_gain
                 element.sinr = (10 ** (-3.0)) * (10 ** (element.sinr/10.0))
                 other_elements = [x for x in linha if x != element]
                 interference = 0.0
                 for o_element in other_elements:
-                    o_element_i = o_element.bs.power - get_pathloss(o_element.bs.type, o_element.distance, o_element.bs.tx_gain)
+                    o_element_i = o_element.bs.power - get_pathloss(o_element.bs.type, o_element.distance) + o_element.bs.tx_gain
                     interference += ((10 ** (-3.0)) * (10 ** (o_element_i/10.0)))
                 element.sinr = element.sinr/(interference + total_thermal_noise)
                 element.sinr = 10.0 * np.log10(element.sinr)

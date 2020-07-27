@@ -3,10 +3,10 @@ from enum import Enum
 
 class Configuration(Enum):
 
-    DEFAULT = (1000000.0, 20.0, 46.0, 32.0, -174.0, 35.0, 0.0, 5.0, 5.0, 1.0, 12.0, 14.0, 1.0)
+    DEFAULT = (1000000.0, 20.0, 46.0, 32.0, -174.0, 35.0, 0.0, 5.0, 5.0, 1.0, 12.0, 14.0, 1.0, 30.0, -10.0)
 
     def __init__(self, simulation_area, bandwidth, mbs_power, sbs_power, noise_power, mbs_height, sbs_height, mbs_gain,
-                 sbs_gain, ue_height, number_subcarriers, number_ofdm_symbols, subframe_duration):
+                 sbs_gain, ue_height, number_subcarriers, number_ofdm_symbols, subframe_duration, max_bias, min_bias):
 
         if simulation_area < 0 or simulation_area is None:
             raise RuntimeError('Incorret value for parameter simulation_area: {}'.format(simulation_area))
@@ -74,6 +74,16 @@ class Configuration(Enum):
         else:
             self._subframe_duration = subframe_duration
 
+        if max_bias is None:
+            raise RuntimeError('Incorret value for parameter max_bias: {}'.format(max_bias))
+        else:
+            self._max_bias = max_bias
+
+        if min_bias is None:
+            raise RuntimeError('Incorret value for parameter min_bias: {}'.format(min_bias))
+        else:
+            self._min_bias = min_bias
+
     @property
     def simulation_area(self):
         return self._simulation_area
@@ -125,3 +135,11 @@ class Configuration(Enum):
     @property
     def subframe_duration(self):
         return self._subframe_duration
+
+    @property
+    def max_bias(self):
+        return self._max_bias
+
+    @property
+    def min_bias(self):
+        return self._min_bias

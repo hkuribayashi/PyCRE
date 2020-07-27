@@ -5,56 +5,84 @@ from rl.observation import ObservationSpace
 class Environment:
 
     def __init__(self, hetnet):
-        self.action_space = ActionSpace(8)
-        self.observation_space = ObservationSpace(100)
+        self.action_space = ActionSpace(2)
+        self.observation_space = ObservationSpace(10)
         self.hetnet = hetnet
         self.hetnet.run()
+        self.hetnet.debug()
 
     def reset(self):
-        return 0
 
-    def step(self, action, episode, step):
+        if int(self.hetnet.evaluation['satisfaction']) >= 90:
+            state = 9
+        elif int(self.hetnet.evaluation['satisfaction']) >= 80:
+            state = 8
+        elif int(self.hetnet.evaluation['satisfaction']) >= 70:
+            state = 7
+        elif int(self.hetnet.evaluation['satisfaction']) >= 60:
+            state = 6
+        elif int(self.hetnet.evaluation['satisfaction']) >= 50:
+            state = 5
+        elif int(self.hetnet.evaluation['satisfaction']) >= 40:
+            state = 4
+        elif int(self.hetnet.evaluation['satisfaction']) >= 30:
+            state = 3
+        elif int(self.hetnet.evaluation['satisfaction']) >= 20:
+            state = 2
+        elif int(self.hetnet.evaluation['satisfaction']) >= 10:
+            state = 1
+        else:
+            state = 0
 
-        bs_0 = self.hetnet.list_bs[0]
-        bs_1 = self.hetnet.list_bs[1]
-        bs_2 = self.hetnet.list_bs[2]
-        bs_3 = self.hetnet.list_bs[3]
+        return state
+
+    def step(self, action):
+
+        bs_0 = self.hetnet.list_bs[1]
 
         if action == 0:
             bs_0.increase_bias()
-        elif action == 1:
-            bs_0.decrease_bias()
-        elif action == 2:
-            bs_1.increase_bias()
-        elif action == 3:
-            bs_1.decrease_bias()
-        elif action == 4:
-            bs_2.increase_bias()
-        elif action == 5:
-            bs_2.decrease_bias()
-        elif action == 6:
-            bs_3.increase_bias()
         else:
-            bs_3.decrease_bias()
-
+            bs_0.decrease_bias()
 
         self.hetnet.run()
 
-        new_state = int(self.hetnet.evaluation['satisfaction'])
-
-        if new_state >= 80:
+        if int(self.hetnet.evaluation['satisfaction']) >= 90:
+            new_state = 9
+            reward = 5.0
+        elif int(self.hetnet.evaluation['satisfaction']) >= 80:
+            new_state = 8
+            reward = 4.0
+        elif int(self.hetnet.evaluation['satisfaction']) >= 70:
+            new_state = 7
+            reward = 3.0
+        elif int(self.hetnet.evaluation['satisfaction']) >= 60:
+            new_state = 6
+            reward = 2.0
+        elif int(self.hetnet.evaluation['satisfaction']) >= 50:
+            new_state = 5
             reward = 1.0
+        elif int(self.hetnet.evaluation['satisfaction']) >= 40:
+            new_state = 4
+            reward = 0.5
+        elif int(self.hetnet.evaluation['satisfaction']) >= 30:
+            new_state = 3
+            reward = 0.25
+        elif int(self.hetnet.evaluation['satisfaction']) >= 20:
+            new_state = 2
+            reward = 0.125
+        elif int(self.hetnet.evaluation['satisfaction']) >= 10:
+            new_state = 1
+            reward = 0.0625
         else:
-            reward = 0.0
+            new_state = 0
+            reward = 0.03125
 
-        if self.hetnet.evaluation['satisfaction'] == 100:
+        if self.hetnet.evaluation['satisfaction'] >= 90:
             done = True
         else:
             done = False
 
         info = self.hetnet.evaluation
-
-        if episode == 99 and step == 999:
-            self.hetnet.debug()
 
         return new_state, reward, done, info

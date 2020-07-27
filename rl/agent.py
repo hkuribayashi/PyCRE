@@ -10,10 +10,10 @@ class Agent:
         # self.env = gym.make("FrozenLake-v0")
         self.env = env
 
-        # Espaço de Acoes:4
+        # Espaço de Acoes: 3 (aumentar, diminuir ou manter)
         self.action_space_size = env.action_space.n
 
-        # Espaco de Estados: 16 (Tabuleiro Frozen Lake)
+        # Espaco de Estados: 10
         self.state_space_size = env.observation_space.n
 
         self.q_table = np.zeros((self.state_space_size, self.action_space_size))
@@ -26,8 +26,8 @@ class Agent:
 
         self.exploration_rate = 1
         self.max_exploration_rate = 1
-        self.min_exploration_rate = 0.1
-        self.exploration_decay_rate = 0.1
+        self.min_exploration_rate = 0.01
+        self.exploration_decay_rate = 0.001
 
         self.rewards_all_episodes = []
         self.ues_atendidos_all_episodes = []
@@ -39,7 +39,6 @@ class Agent:
             state = self.env.reset()
             done = False
             rewards_current_episode = 0
-            ues_antendidos = 0
 
             for step in range(self.max_steps_per_episode):
 
@@ -51,12 +50,9 @@ class Agent:
                     action = self.env.action_space.sample()
 
                 # Take new action
-                new_state, reward, done, info = self.env.step(action, episode, step)
+                new_state, reward, done, info = self.env.step(action)
 
                 # Update Q-table
-                self.q_table[state, action] = self.q_table[state, action] * (1 - self.learning_rate) + \
-                                         self.learning_rate * (reward + self.discount_rate * np.max(self.q_table[new_state, :]))
-
                 self.q_table[state, action] = self.q_table[state, action] * (1 - self.learning_rate) + \
                                          self.learning_rate * (reward + self.discount_rate * np.max(self.q_table[new_state, :]))
 
@@ -66,11 +62,16 @@ class Agent:
                 # Add new reward
                 rewards_current_episode += reward
 
-                ues_antendidos += new_state
+            if episode % 100 == 0:
+                print('Q_Table Episode: {}'.format(episode))
+                print(self.q_table)
+                print('Current State: {}'.format(state))
+                print()
 
-            print('Q_Table Episode: {}'.format(episode))
-            print(self.q_table)
-            print()
+            # Break
+            if done:
+                print('Finish')
+                break
 
             # Exploration rate decay
             self.exploration_rate = self.min_exploration_rate + \
@@ -78,7 +79,6 @@ class Agent:
 
             # Add current episode reward to total rewards list
             self.rewards_all_episodes.append(rewards_current_episode)
-            self.ues_atendidos_all_episodes.append(ues_antendidos)
 
     def get_metrics(self):
 

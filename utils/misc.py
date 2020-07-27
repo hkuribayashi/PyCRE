@@ -1,11 +1,11 @@
 import numpy as np
 
 
-def get_pathloss(type_, distance, tx_gain):
+def get_pathloss(type_, distance):
     if type_ == 'MBS':
-        pathloss = 128.1 + (37.6 * np.log10((max(distance, 35.0) / 1000.0))) - tx_gain
+        pathloss = 128.0 + (37.6 * np.log10(max(distance, 35.0) / 1000.0))
     else:
-        pathloss = 140.7 + (36.7 * np.log10((max(distance, 10.0) / 1000.0))) - tx_gain
+        pathloss = 140.7 + (36.7 * np.log10((max(distance, 10.0) / 1000.0)))
 
     return pathloss
 
@@ -44,6 +44,6 @@ def get_efficiency(sinr):
     elif sinr >= -4.0:
         efficiency = 0.23
     else:
-        efficiency = 0.15
+        efficiency = 5.55
 
     return efficiency
