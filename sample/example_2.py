@@ -1,12 +1,12 @@
 import numpy as np
 
-from config.param import Configuration
+from config.network import Network
 from mobility.basic import Point
 from network.bs import BS
 from network.hetnet import HetNet
 from network.ue import UE
 
-h = HetNet(Configuration.DEFAULT)
+h = HetNet(Network.DEFAULT)
 
 # Deploy a MBS
 p1 = Point(0.0, 0.0, 35.0)

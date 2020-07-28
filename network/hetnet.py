@@ -131,5 +131,7 @@ class HetNet:
                 ne.ue.evaluation = False
 
     def debug(self):
-        # get_visual(self)
-        print(self.evaluation)
+        for linha in self.network_element:
+            biased_sinr = [o.biased_sinr for o in linha]
+            print(biased_sinr)
+        get_visual(self)

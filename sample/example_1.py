@@ -1,6 +1,6 @@
 import numpy as np
 
-from config.param import Configuration
+from config.network import Network
 from mobility.basic import Point
 from network.bs import BS
 from network.hetnet import HetNet
@@ -10,7 +10,7 @@ from network.ue import UE
 from rl.env import Environment
 from rl.agent import Agent
 
-h = HetNet(Configuration.DEFAULT)
+h = HetNet(Network.DEFAULT)
 
 # Deploy a MBS
 p0 = Point(0.0, 0.0, 35.0)
@@ -32,7 +32,7 @@ for i in range(10):
     ue = UE(i, p_i)
     h.add_ue(ue)
 
-for i in range(10, 35):
+for i in range(10, 32):
     x = np.random.randint(-100, 100)
     y = np.random.randint(-100, 100)
     p_i = Point(x, y, 5.0)
@@ -42,3 +42,4 @@ for i in range(10, 35):
 env = Environment(h)
 a = Agent(env)
 a.run()
+a.get_statistics()
