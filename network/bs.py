@@ -10,35 +10,35 @@ class BS:
         self.resouce_blocks = 0.0
         self.hetnet = None
 
-    def increase_bias(self):
+    def increase_bias(self, bias):
         for coluna in map(list, zip(*self.hetnet.network_element)):
             if coluna[0].bs.id == self.id:
-                print('Increasing Bias')
+                # print('Increasing Bias')
                 for ne in coluna:
-                    print('SINR: {}'.format(ne.sinr))
-                    print('Current Biased SINR: {}'.format(ne.biased_sinr))
+                    # print('SINR: {}'.format(ne.sinr))
+                    # print('Current Biased SINR: {}'.format(ne.biased_sinr))
                     if abs(ne.sinr - ne.biased_sinr) < self.hetnet.env.max_bias:
-                        ne.biased_sinr += 20.0
-                        print('New Biased SINR: {}'.format(ne.biased_sinr))
-                    else:
-                        print('Limite Maximo')
-                        print('New Bias: {}'.format(ne.biased_sinr))
-                    print()
+                        ne.biased_sinr += bias
+                        # print('New Biased SINR: {}'.format(ne.biased_sinr))
+                    # else:
+                        # print('Limite Maximo')
+                        # print('New Bias: {}'.format(ne.biased_sinr))
+                    # print()
 
-    def decrease_bias(self):
+    def decrease_bias(self, bias):
         for coluna in map(list, zip(*self.hetnet.network_element)):
             if coluna[0].bs.id == self.id:
-                print('Decreasing Bias')
+                # print('Decreasing Bias')
                 for ne in coluna:
-                    print('SINR: {}'.format(ne.sinr))
-                    print('Current Biased SINR: {}'.format(ne.biased_sinr))
+                    # print('SINR: {}'.format(ne.sinr))
+                    # print('Current Biased SINR: {}'.format(ne.biased_sinr))
                     if abs(ne.sinr - ne.biased_sinr) < abs(self.hetnet.env.min_bias):
-                        ne.biased_sinr += -5.0
-                        print('New Biased SINR: {}'.format(ne.biased_sinr))
-                    else:
-                        print('Limite Minimo')
-                        print('New Bias: {}'.format(ne.biased_sinr))
-                    print()
+                        ne.biased_sinr += bias
+                        # print('New Biased SINR: {}'.format(ne.biased_sinr))
+                    # else:
+                        # print('Limite Minimo')
+                        # print('New Bias: {}'.format(ne.biased_sinr))
+                    # print()
 
     def maintain_bias(self):
         pass

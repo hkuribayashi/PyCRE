@@ -1,6 +1,6 @@
 import numpy as np
 
-from config.env import Configuration
+from config.param import Configuration
 from mobility.basic import Point
 from network.bs import BS
 from network.hetnet import HetNet

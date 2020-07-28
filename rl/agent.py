@@ -34,6 +34,7 @@ class Agent:
     def run(self):
         # Q-learning algorithm
         for episode in range(self.num_episodes):
+
             # initialize new episode params
             state = self.env.reset()
             done = False
@@ -72,7 +73,7 @@ class Agent:
 
             # Break
             if done:
-                print('Finish')
+                print('Finish at Episode: {}'.format(episode))
                 break
 
             # Exploration rate decay

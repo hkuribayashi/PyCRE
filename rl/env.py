@@ -5,7 +5,7 @@ from rl.observation import ObservationSpace
 class Environment:
 
     def __init__(self, hetnet):
-        self.action_space = ActionSpace(2)
+        self.action_space = ActionSpace(7)
         self.observation_space = ObservationSpace(10)
         self.hetnet = hetnet
         self.hetnet.run()
@@ -41,9 +41,20 @@ class Environment:
         bs_0 = self.hetnet.list_bs[1]
 
         if action == 0:
-            bs_0.increase_bias()
-        else:
-            bs_0.decrease_bias()
+            bs_0.increase_bias(15.0)
+        elif action == 1:
+            bs_0.increase_bias(10.0)
+        elif action == 2:
+            bs_0.increase_bias(5.0)
+        elif action == 3:
+            bs_0.maintain_bias()
+        elif action == 4:
+            bs_0.decrease_bias(-1.0)
+        elif action == 5:
+            bs_0.decrease_bias(-3.0)
+        elif action == 6:
+            bs_0.decrease_bias(-5.0)
+
         self.hetnet.run()
 
         if int(self.hetnet.evaluation['satisfaction']) >= 90:

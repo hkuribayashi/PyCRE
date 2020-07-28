@@ -131,5 +131,5 @@ class HetNet:
                 ne.ue.evaluation = False
 
     def debug(self):
-        get_visual(self)
+        # get_visual(self)
         print(self.evaluation)
