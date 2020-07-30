@@ -17,8 +17,9 @@ class Environment:
         state = int(self.hetnet.evaluation['satisfaction'])
         return state
 
-    def step(self, action, episode, state, step):
+    def step(self, action, state):
 
+        # TODO: Filter per SBS
         bs_0 = self.hetnet.list_bs[1]
 
         if action == 0:
@@ -39,27 +40,23 @@ class Environment:
         self.hetnet.run()
 
         new_state = int(self.hetnet.evaluation['satisfaction'])
-        if new_state >= 90:
+        if new_state >= 95:
             reward = 100.0
-            done = True
+            has_done = True
+            has_changed = True
         elif new_state > state:
             reward = 0.01
-            done = False
+            has_done = False
+            has_changed = True
         elif new_state < state:
             reward = -0.01
-            done = False
+            has_done = False
+            has_changed = True
         else:
             reward = 0.0
-            done = False
-
-        #print('Episode: {}'.format(episode))
-        #print('Step: {}'.format(step))
-        #print('Last Action: {}'.format(action))
-        #print('Old State: {}'.format(state))
-        #print('New State: {}'.format(new_state))
-        #self.hetnet.debug()
-        #print()
+            has_done = False
+            has_changed = False
 
         info = self.hetnet.evaluation
 
-        return new_state, reward, done, info
+        return new_state, reward, has_done, has_changed, info

@@ -21,14 +21,15 @@ h.add_bs(mbs)
 h.add_bs(sbs_1)
 
 # Deploy 20 UEs
-for i in range(5):
+for i in range(10):
     x = np.random.randint(-60, 60)
     y = np.random.randint(-60, 60)
-    p_i = Point(x, y, 5.0)
+    p_i = Point(x, y, 1.0)
     ue = UE(i, p_i)
     h.add_ue(ue)
 
 h.run()
+h.debug()
 
 # Passo 1: SINR 5 Usuários (linha) x 2 BS (colunas)
 # Passo 2: User Association
@@ -36,9 +37,10 @@ h.run()
 # Passo 4: RBs: MBS (100) = 100/9 = 10, SBS (100) = 100/1
 # Passo 5: Datarate Data-rate (Qtd de RBs de cada UE, SINR, Modulação)
 
-h.debug()
-# +20.0 dB -> Limite: Max 80.0 dB
 sbs_1.increase_bias(20.0)
+h.run()
+h.debug()
 
-# -5.0 dB -> Limite: Min -10.0 dB
-sbs_1.decrease_bias(-5.0)
+sbs_1.increase_bias(20.0)
+h.run()
+h.debug()

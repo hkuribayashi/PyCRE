@@ -1,15 +1,15 @@
 import numpy as np
 
 from config.network import Network
+from config.qlearning import Agent
 from mobility.basic import Point
 from network.bs import BS
 from network.hetnet import HetNet
 from network.ue import UE
+from rl.env import Environment
+from rl.agent import SingleAgent
 
 # Instantiate a Hetnet using Default Configs
-from rl.env import Environment
-from rl.agent import Agent
-
 h = HetNet(Network.DEFAULT)
 
 # Deploy a MBS
@@ -24,7 +24,7 @@ sbs = BS(2, 'SBS', p1)
 h.add_bs(mbs)
 h.add_bs(sbs)
 
-# Deploy 20 UEs
+# Deploy 10 UEs
 for i in range(10):
     x = np.random.randint(30, 80)
     y = np.random.randint(30, 80)
@@ -32,6 +32,7 @@ for i in range(10):
     ue = UE(i, p_i)
     h.add_ue(ue)
 
+# Deploy 22 UEs
 for i in range(10, 32):
     x = np.random.randint(-100, 100)
     y = np.random.randint(-100, 100)
@@ -40,6 +41,6 @@ for i in range(10, 32):
     h.add_ue(ue)
 
 env = Environment(h)
-a = Agent(env)
+a = SingleAgent(env, Agent.DEFAULT)
 a.run()
-a.get_statistics()
+a.get_metrics()
