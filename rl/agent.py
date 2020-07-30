@@ -1,21 +1,18 @@
 import numpy as np
-import gym
 import random
-import time
-from IPython.display import clear_output
 
 
 class Agent:
     def __init__(self, env):
-        # self.env = gym.make("FrozenLake-v0")
         self.env = env
 
-        # Espaço de Acoes: 7 (aumentar ou diminuir)
+        # Action Space
         self.action_space_size = env.action_space.n
 
-        # Espaco de Estados: 20
+        # Observation Space
         self.state_space_size = env.observation_space.n
 
+        # Q-table: State Space x Action Space
         self.q_table = np.zeros((self.state_space_size, self.action_space_size))
 
         self.num_episodes = 10000
@@ -29,9 +26,8 @@ class Agent:
         self.min_exploration_rate = 0.01
         self.exploration_decay_rate = 0.001
 
-        self.max_iter_per_state = self.max_steps_per_episode * 0.5
-
-        self.rewards_all_episodes = []
+        self.max_iter_per_state = self.max_steps_per_episode * 0.2
+        self.satisfaction_all_episodes = []
 
     def run(self):
 
@@ -42,8 +38,8 @@ class Agent:
 
             # initialize new episode params
             state = self.env.reset()
-            done = False
-            rewards_current_episode = 0
+            satisfaction_current_episode = 0
+            steps_per_episode = 0
             iter_per_state = 0
 
             for step in range(self.max_steps_per_episode):
@@ -71,24 +67,24 @@ class Agent:
                 # Set new state
                 state = new_state
 
-                # Add new reward
-                rewards_current_episode += reward
+                # Add new satisfaction
+                satisfaction_current_episode += info['satisfaction']
 
                 if self.max_iter_per_state <= iter_per_state:
                     flag = True
 
                 # Break
                 if done or flag:
-                    #print('Finish at Episode: {}'.format(episode))
-                    # print()
                     break
+
+                steps_per_episode = steps_per_episode + 1
 
             # Exploration rate decay
             self.exploration_rate = self.min_exploration_rate + \
                                (self.max_exploration_rate - self.min_exploration_rate) * np.exp(-self.exploration_decay_rate * episode)
 
             # Add current episode reward to total rewards list
-            self.rewards_all_episodes.append(rewards_current_episode)
+            self.satisfaction_all_episodes.append(satisfaction_current_episode/steps_per_episode)
 
             # Print Q-Table
             if episode % 1000 == 0:
@@ -98,13 +94,14 @@ class Agent:
                 print()
 
     def get_statistics(self):
-        # Calculate and print the average reward per thousand episodes
-        rewards_per_thosand_episodes = np.split(np.array(self.rewards_all_episodes), self.num_episodes / 1000)
+        # Separa 10000 episódios em vários arrays de 1000 em 1000
+        satisfaction_per_thosand_episodes = np.split(np.array(self.satisfaction_all_episodes), self.num_episodes / 1000)
+
         count = 1000
-        print("********Average reward per thousand episodes********\n")
-        for r in rewards_per_thosand_episodes:
-            avg_reward = sum(r / 1000)
-            print(count, ": ", str(avg_reward))
+        print("********Average satisfaction per thousand episodes********\n")
+        for s in satisfaction_per_thosand_episodes:
+            avg_satisfaction = sum(s / 1000)
+            print(count, ": ", str(avg_satisfaction))
             count += 1000
 
             # Print updated Q-table

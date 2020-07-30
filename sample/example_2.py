@@ -38,7 +38,7 @@ h.run()
 
 h.debug()
 # +20.0 dB -> Limite: Max 80.0 dB
-sbs_1.increase_bias()
+sbs_1.increase_bias(20.0)
 
 # -5.0 dB -> Limite: Min -10.0 dB
-sbs_1.decrease_bias()
+sbs_1.decrease_bias(-5.0)

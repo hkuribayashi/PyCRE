@@ -10,14 +10,13 @@ from utils.misc import get_pathloss, get_efficiency
 
 class HetNet:
 
-    flag = False
-
     def __init__(self, env):
         self.list_ue = list()
         self.list_bs = list()
         self.network_element = list()
         self.env = env
         self.evaluation = dict(satisfaction=0.0, sumrate=0.0, medianrate=0.0)
+        self.flag = False
 
     def add_bs(self, bs):
         if bs.type == 'MBS':
@@ -43,9 +42,9 @@ class HetNet:
     def run(self):
 
         # Constructs the NetworkElement structure only once
-        if HetNet.flag is False:
+        if self.flag is False:
             self.__get_ne()
-            HetNet.flag = True
+            self.flag = True
 
             # Compute SINR
             self.__get_sinr()
@@ -123,12 +122,23 @@ class HetNet:
         self.evaluation['sumrate'] = sumrate
 
     def __reset(self):
+        self.evaluation = dict(satisfaction=0.0, sumrate=0.0, medianrate=0.0)
         for linha in self.network_element:
             for ne in linha:
                 ne.coverage_status = False
                 ne.ue.resource_blocks = 0.0
                 ne.bs.load = 0.0
                 ne.ue.evaluation = False
+
+    def reset_hetnet(self):
+        self.evaluation = dict(satisfaction=0.0, sumrate=0.0, medianrate=0.0)
+        for linha in self.network_element:
+            for ne in linha:
+                ne.coverage_status = False
+                ne.ue.resource_blocks = 0.0
+                ne.bs.load = 0.0
+                ne.ue.evaluation = False
+                ne.biased_sinr = ne.sinr
 
     def debug(self):
         for linha in self.network_element:
