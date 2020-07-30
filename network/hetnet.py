@@ -109,17 +109,12 @@ class HetNet:
             ne[0].ue.datarate = bitrate_ue
 
     def __get_metrics(self):
-        satisfaction = 0.0
-        sumrate = 0.0
-        datarates = np.zeros(len(self.list_ue))
-        for index, ue in enumerate(self.list_ue):
-            if ue.evaluation:
-                satisfaction = satisfaction + 1
-            datarates[index] = ue.datarate
-            sumrate += ue.datarate
-        self.evaluation['satisfaction'] = (satisfaction/len(self.list_ue)) * 100
-        self.evaluation['medianrate'] = np.median(datarates)
-        self.evaluation['sumrate'] = sumrate
+        dr = np.array([ue.datarate for ue in self.list_ue])
+        sf = np.array([ue.datarate for ue in self.list_ue if ue.evaluation is True])
+
+        self.evaluation['satisfaction'] = (sf.size/len(self.list_ue))*100
+        self.evaluation['medianrate'] = np.median(dr)
+        self.evaluation['sumrate'] = dr.sum()
 
     def __reset(self):
         self.evaluation = dict(satisfaction=0.0, sumrate=0.0, medianrate=0.0)
