@@ -151,4 +151,4 @@ for key in traffic_level:
         save_to_csv(mean_evolution_list_100_pop_200, "/Users/hugo/Desktop/PyCRE/csv/",
                     "mean_evolution_list_100_pop_200.csv")
         save_to_csv(mean_evolution_list_100_pop_200_gbest, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_100_pop_200_gbest_gbest.csv")
+                    "mean_evolution_list_100_pop_200_gbest.csv")

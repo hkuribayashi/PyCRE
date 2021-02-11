@@ -1,3 +1,4 @@
+import pandas as pd
 import numpy as np
 import scipy.stats
 import csv
@@ -86,3 +87,8 @@ def save_to_csv(data, path, filename):
     with open('{}{}'.format(path, filename), 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(data)
+
+
+def consolidate_results(path, filename):
+    data = pd.read_csv('{}{}'.format(path, filename), header=None, delimiter=',', sep=',')
+    return data.mean(axis = 0)

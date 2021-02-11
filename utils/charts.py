@@ -6,6 +6,7 @@ from sklearn.cluster import DBSCAN
 
 from config.network import Network
 
+
 def get_visual(hetnet):
 
     # Legend
@@ -48,23 +49,22 @@ def get_visual(hetnet):
     plt.show()
 
 
-def get_evaluation_evolution(data):
+def get_evaluation_evolution(data, filename, marker=''):
     for key in data:
-        plt.plot(data[key], '-*', label=key)
-        # plt.plot(data, '-*', label='PSO-DCM', color='#1F77B4')
+        plt.plot(data[key], marker, label=key, markersize=2.2)
 
     plt.xlabel('Iterations')
     plt.ylabel('Davies-Bouldin Index')
     plt.grid(linestyle=':')
     plt.legend(loc='best')
 
-    plt.savefig('{}Mean-Evaluation-Evolution.eps'.format(Network.DEFAULT.dir_output_images), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+    plt.savefig('{}{}'.format(Network.DEFAULT.dir_output_images, filename), dpi=Network.DEFAULT.image_resolution,
+                bbox_inches='tight')
     plt.close()
 
 
-
-def get_visual_cluster(pso_gbest, X):
-    clustering = DBSCAN(eps=pso_gbest.best_epsilon, min_samples=pso_gbest.best_min_samples).fit(X)
+def get_visual_cluster(pso_gbest, data):
+    clustering = DBSCAN(eps=pso_gbest.best_epsilon, min_samples=pso_gbest.best_min_samples).fit(data)
     labels = clustering.labels_
     core_samples_mask = np.zeros_like(clustering.labels_, dtype=bool)
     core_samples_mask[clustering.core_sample_indices_] = True
@@ -80,11 +80,11 @@ def get_visual_cluster(pso_gbest, X):
 
         class_member_mask = (labels == k)
 
-        xy = X[class_member_mask & core_samples_mask]
+        xy = data[class_member_mask & core_samples_mask]
         plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),
                  markeredgecolor='k', markersize=14)
 
-        xy = X[class_member_mask & ~core_samples_mask]
+        xy = data[class_member_mask & ~core_samples_mask]
         plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),
                  markeredgecolor='k', markersize=6)
     plt.title('Estimated number of clusters: %d' % n_clusters_)
