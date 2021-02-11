@@ -1,4 +1,9 @@
 import numpy as np
+import scipy.stats
+import csv
+import matplotlib.pyplot as plt
+
+from mobility.point import Point
 
 
 def get_pathloss(type_, distance):
@@ -47,3 +52,37 @@ def get_efficiency(sinr):
         efficiency = 5.55
 
     return efficiency
+
+
+def get_hppp(x, y, z, lambda_):
+    # Get total area
+    total_area = x * y
+
+    # Initialize the return variable
+    result = []
+
+    # Compute total number of points
+    number_points = scipy.stats.poisson(lambda_ * total_area).rvs()
+
+    # x coordinates of Poisson points
+    xx = x * scipy.stats.uniform.rvs(0, 1, (number_points, 1))
+
+    # y coordinates of Poisson points
+    yy = y * scipy.stats.uniform.rvs(0, 1, (number_points, 1))
+
+    # plt.scatter(xx, yy, edgecolor='b', facecolor='none', alpha=0.5)
+    # plt.xlabel("x")
+    # plt.ylabel("y")
+    # plt.show()
+
+    for (i, j) in zip(xx, yy):
+        #result.append(Point(i[0], j[0], z))
+        result.append([i[0], j[0]])
+
+    return result
+
+
+def save_to_csv(data, path, filename):
+    with open('{}{}'.format(path, filename), 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(data)

@@ -10,6 +10,7 @@ class UE:
         self.resource_blocks = 0.0
         self.profile = ApplicationProfile.DATA_BACKUP
         self._evaluation = False
+        self.priority = False
 
     @property
     def evaluation(self):

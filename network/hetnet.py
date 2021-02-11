@@ -3,6 +3,7 @@ from operator import attrgetter
 
 import numpy as np
 
+from mobility.ueQeue import SimpleQueue
 from network.ne import NetworkElement
 from utils.charts import get_visual
 from utils.misc import get_pathloss, get_efficiency
@@ -11,12 +12,13 @@ from utils.misc import get_pathloss, get_efficiency
 class HetNet:
 
     def __init__(self, env):
-        self.list_ue = list()
+        self.ue_list = list()
         self.list_bs = list()
         self.network_element = list()
         self.env = env
-        self.evaluation = dict(satisfaction=0.0, sumrate=0.0, medianrate=0.0)
-        self.flag = False
+        self.evaluation = dict(satisfaction=0.0, total_ue=0.0)
+        # TODO: Incluir parâmtros na Configuração DEFAULT
+        self.ueQueue = SimpleQueue(4, 1, 1000, self.env.simulation_area, self.env.ue_height)
 
     def add_bs(self, bs):
         if bs.type == 'MBS':
@@ -29,40 +31,44 @@ class HetNet:
         bs.hetnet = self
         self.list_bs.append(bs)
 
-    def add_ue(self, ue):
-        self.list_ue.append(ue)
-
     def __get_ne(self):
-        for ue in self.list_ue:
+        for ue in self.ue_list:
             linha_network_element = list()
             for bs in self.list_bs:
                 linha_network_element.append(NetworkElement(ue, bs))
             self.network_element.append(linha_network_element)
 
-    def run(self):
+    def run(self, timestep):
+        #Add UEs
+        # for ue in self.ueQueue.ues[timestep]:
+        #     self.ue_list.append(ue)
 
-        # Constructs the NetworkElement structure only once
-        if self.flag is False:
+        for idx in range(timestep):
+            for ue in self.ueQueue.ues[idx]:
+                self.ue_list.append(ue)
+
+        if len(self.ue_list) > 0 and len(self.list_bs) > 0:
+            # Constructs the NetworkElement structure
             self.__get_ne()
-            self.flag = True
 
             # Compute SINR
             self.__get_sinr()
 
-        else:
-            self.__reset()
+            # Compute UE x BS Association
+            self.__get_association()
 
-        # Compute UE x BS Association
-        self.__get_association()
+            # Compute Radio Resource Allocation
+            self.__get_resource_allocation()
 
-        # Compute Radio Resource Allocation
-        self.__get_resource_allocation()
+            # Compute UE Data Rate
+            self.__get_ue_datarate()
 
-        # Compute UE Data Rate
-        self.__get_ue_datarate()
+            # Compute Performance Evaluation
+            self.__get_metrics()
 
-        # Compute Performance Evaluation
-        self.__get_metrics()
+    def reset(self):
+        self.network_element = list()
+        self.evaluation = dict(satisfaction=0.0, total_ue=0.0)
 
     def __get_sinr(self):
         bw = self.env.bandwidth * (10**6)
@@ -109,31 +115,9 @@ class HetNet:
             ne[0].ue.datarate = bitrate_ue
 
     def __get_metrics(self):
-        #dr = np.array([ue.datarate for ue in self.list_ue])
-        sf = np.array([ue.datarate for ue in self.list_ue if ue.evaluation is True])
-
-        self.evaluation['satisfaction'] = (sf.size/len(self.list_ue))*100
-        # self.evaluation['medianrate'] = np.median(dr)
-        # self.evaluation['sumrate'] = dr.sum()
-
-    def __reset(self):
-        self.evaluation = dict(satisfaction=0.0, sumrate=0.0, medianrate=0.0)
-        for linha in self.network_element:
-            for ne in linha:
-                ne.coverage_status = False
-                ne.ue.resource_blocks = 0.0
-                ne.bs.load = 0.0
-                ne.ue.evaluation = False
-
-    def reset_hetnet(self):
-        self.evaluation = dict(satisfaction=0.0, sumrate=0.0, medianrate=0.0)
-        for linha in self.network_element:
-            for ne in linha:
-                ne.coverage_status = False
-                ne.ue.resource_blocks = 0.0
-                ne.bs.load = 0.0
-                ne.ue.evaluation = False
-                ne.biased_sinr = ne.sinr
+        sf = np.array([ue.datarate for ue in self.ue_list if ue.evaluation is True])
+        self.evaluation['satisfaction'] = (sf.size / len(self.ue_list)) * 100
+        self.evaluation['total_ue'] = len(self.ue_list)
 
     def debug(self):
         for linha in self.network_element:
