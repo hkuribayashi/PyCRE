@@ -7,24 +7,10 @@ from network.hetnet import HetNet
 from utils.misc import save_to_csv
 
 
-# traffic_level = {'10': 100}
 traffic_level = {'10': 100, '60': 600, '100': 999}
+path = "/Users/hugo/Desktop/PyCRE/csv/"
 
 for key in traffic_level:
-
-    # Create a HetNet
-    h = HetNet(Network.DEFAULT)
-
-    # Deploy a MBS
-    p0 = Point(0.0, 0.0, 35.0)
-    mbs = BS(0, 'MBS', p0)
-
-    # Add each BS in the HetNet
-    h.add_bs(mbs)
-
-    # Run the HetNet
-    h.run(traffic_level[key])
-    print(h.evaluation)
 
     # Start the Dynamic Clustering Module
     mean_evolution_list_10_pop_50 = []
@@ -52,7 +38,21 @@ for key in traffic_level:
     mean_evolution_list_100_pop_200_gbest = []
 
     # TODO: Incluir o número de repetições na configuração DEFAULT
-    for idx in range(50):
+    for idx in range(1):
+        # Instantiate a HetNet
+        h = HetNet(Network.DEFAULT)
+
+        # Deploy a MBS
+        p0 = Point(0.0, 0.0, 35.0)
+        mbs = BS(0, 'MBS', p0)
+
+        # Add each BS in the HetNet
+        h.add_bs(mbs)
+
+        # Run the HetNet
+        h.run(traffic_level[key])
+        print(h.evaluation)
+
         # Instantiate DC Module with DBSCAM algorithm
         dcm = DCM(ClusteringMethod.DBSCAN, h.ue_list)
 
@@ -100,55 +100,37 @@ for key in traffic_level:
     # Save the results in CSV files
     if key is '10':
         # 10% of all UEs and 50 PSO particles
-        save_to_csv(mean_evolution_list_10_pop_50, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_10_pop_50.csv")
-        save_to_csv(mean_evolution_list_10_pop_50_gbest, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_10_pop_50_gbest.csv")
+        save_to_csv(mean_evolution_list_10_pop_50, path, "mean_evolution_list_10_pop_50.csv")
+        save_to_csv(mean_evolution_list_10_pop_50_gbest, path, "mean_evolution_list_10_pop_50_gbest.csv")
 
         # 10% of all UEs and 100 PSO particles
-        save_to_csv(mean_evolution_list_10_pop_100, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_10_pop_100.csv")
-        save_to_csv(mean_evolution_list_10_pop_100_gbest, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_10_pop_100_gbest.csv")
+        save_to_csv(mean_evolution_list_10_pop_100, path, "mean_evolution_list_10_pop_100.csv")
+        save_to_csv(mean_evolution_list_10_pop_100_gbest, path, "mean_evolution_list_10_pop_100_gbest.csv")
 
         # 10% of all UEs and 200 PSO particles
-        save_to_csv(mean_evolution_list_10_pop_200, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_10_pop_200.csv")
-        save_to_csv(mean_evolution_list_10_pop_200_gbest, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_10_pop_200_gbest.csv")
+        save_to_csv(mean_evolution_list_10_pop_200, path, "mean_evolution_list_10_pop_200.csv")
+        save_to_csv(mean_evolution_list_10_pop_200_gbest, path, "mean_evolution_list_10_pop_200_gbest.csv")
     elif key is '60':
         # 60% of all UEs and 50 PSO particles
-        save_to_csv(mean_evolution_list_60_pop_50, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_60_pop_50.csv")
-        save_to_csv(mean_evolution_list_60_pop_50_gbest, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_60_pop_50_gbest.csv")
+        save_to_csv(mean_evolution_list_60_pop_50, path, "mean_evolution_list_60_pop_50.csv")
+        save_to_csv(mean_evolution_list_60_pop_50_gbest, path, "mean_evolution_list_60_pop_50_gbest.csv")
 
         # 60% of all UEs and 100 PSO particles
-        save_to_csv(mean_evolution_list_60_pop_100, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_60_pop_100.csv")
-        save_to_csv(mean_evolution_list_60_pop_100_gbest, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_60_pop_100_gbest.csv")
+        save_to_csv(mean_evolution_list_60_pop_100, path, "mean_evolution_list_60_pop_100.csv")
+        save_to_csv(mean_evolution_list_60_pop_100_gbest, path, "mean_evolution_list_60_pop_100_gbest.csv")
 
         # 60% of all UEs and 200 PSO particles
-        save_to_csv(mean_evolution_list_60_pop_200, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_60_pop_200.csv")
-        save_to_csv(mean_evolution_list_60_pop_200_gbest, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_60_pop_200_gbest.csv")
+        save_to_csv(mean_evolution_list_60_pop_200, path, "mean_evolution_list_60_pop_200.csv")
+        save_to_csv(mean_evolution_list_60_pop_200_gbest, path, "mean_evolution_list_60_pop_200_gbest.csv")
     elif key is '100':
         # 100% of all UEs and 100 PSO particles
-        save_to_csv(mean_evolution_list_100_pop_50, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_100_pop_50.csv")
-        save_to_csv(mean_evolution_list_100_pop_50_gbest, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_100_pop_50_gbest.csv")
+        save_to_csv(mean_evolution_list_100_pop_50, path, "mean_evolution_list_100_pop_50.csv")
+        save_to_csv(mean_evolution_list_100_pop_50_gbest, path, "mean_evolution_list_100_pop_50_gbest.csv")
 
         # 100% of all UEs and 100 PSO particles
-        save_to_csv(mean_evolution_list_100_pop_100, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_100_pop_100.csv")
-        save_to_csv(mean_evolution_list_100_pop_100_gbest, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_100_pop_100_gbest.csv")
+        save_to_csv(mean_evolution_list_100_pop_100, path, "mean_evolution_list_100_pop_100.csv")
+        save_to_csv(mean_evolution_list_100_pop_100_gbest, path, "mean_evolution_list_100_pop_100_gbest.csv")
 
         # 100% of all UEs and 100 PSO particles
-        save_to_csv(mean_evolution_list_100_pop_200, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_100_pop_200.csv")
-        save_to_csv(mean_evolution_list_100_pop_200_gbest, "/Users/hugo/Desktop/PyCRE/csv/",
-                    "mean_evolution_list_100_pop_200_gbest.csv")
+        save_to_csv(mean_evolution_list_100_pop_200, path, "mean_evolution_list_100_pop_200.csv")
+        save_to_csv(mean_evolution_list_100_pop_200_gbest, path, "mean_evolution_list_100_pop_200_gbest.csv")
