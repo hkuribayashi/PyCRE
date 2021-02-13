@@ -4,7 +4,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.metrics import davies_bouldin_score
 
 
-class Particle:
+class CoPsoParticle:
 
     def __init__(self, clustering_method, data_size):
         self.epsilon = random.randint(1, 1000)
@@ -34,7 +34,7 @@ class Particle:
                 self.best_epsilon = self.epsilon
                 self.best_min_samples = self.min_samples
 
-    def update_position(self, g_best, inertia_weight):
+    def update_position(self, g_best, constriction_factor):
         phi1 = random.random()
         phi2 = random.random()
 
@@ -43,7 +43,7 @@ class Particle:
                            (g_best.best_epsilon - self.epsilon) * phi2 * 2.05
 
         # Update epsilon position
-        self.epsilon = self.epsilon + (inertia_weight * velocity_epsilon)
+        self.epsilon = constriction_factor * (self.epsilon + velocity_epsilon)
 
         # Epsilon Constraint
         if self.epsilon < 0:
@@ -54,7 +54,7 @@ class Particle:
                                (g_best.best_min_samples - self.min_samples) * phi2
 
         # Update Min samples position
-        self.min_samples = int(self.min_samples + (inertia_weight * velocity_min_samples))
+        self.min_samples = int(constriction_factor * (self.min_samples + velocity_min_samples))
 
         # Min Samples Constraint
         if self.min_samples < 2:
