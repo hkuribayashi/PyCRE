@@ -1,4 +1,6 @@
 from operator import attrgetter
+import multiprocessing as mp
+
 from si.pso.particle import Particle
 
 
@@ -15,6 +17,7 @@ class PSO:
         self.inertia_weight = []
         self.mean_evaluation_evolution = []
         self.gbest_evaluation_evolution = []
+        self.pool = mp.Pool(mp.cpu_count())
 
         # Create the PSO population
         for i in range(population_size):
@@ -72,7 +75,8 @@ class PSO:
 
             # Update the particles' position
             for p in self.population:
-                p.update_position(self.g_best, self.inertia_weight[counter])
+                # p.update_position(self.g_best, self.inertia_weight[counter])
+                self.pool.apply(p.update_position, args=(self.g_best, self.inertia_weight[counter]))
 
             counter += 1
             # Save current mean evaluation
