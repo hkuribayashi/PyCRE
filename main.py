@@ -39,7 +39,7 @@ for key in traffic_level:
     mean_evolution_list_100_pop_200_gbest = []
 
     # TODO: Incluir o número de repetições na configuração DEFAULT
-    for idx in range(1):
+    for idx in range(100):
         # Instantiate a HetNet
         h = HetNet(Network.DEFAULT)
 
