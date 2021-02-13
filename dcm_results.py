@@ -3,7 +3,7 @@ from utils.misc import consolidate_results
 
 path = "/Users/hugo/Desktop/PyCRE/csv2/"
 
-#traffic_level = {'10': 100, '60': 600, '100': 999}
+# traffic_level = {'10': 100, '60': 600, '100': 999}
 traffic_level = {'10': 100, '60': 600}
 population_size = [50, 100, 200]
 chart_data = {}
