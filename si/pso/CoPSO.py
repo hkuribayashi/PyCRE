@@ -1,3 +1,4 @@
+import random
 import numpy as np
 from operator import attrgetter
 import multiprocessing as mp
@@ -53,7 +54,7 @@ class CoPSO:
             # Update the particles' position
             for p in self.population:
                 # p.update_position(self.g_best, self.constricion_factor)
-                self.pool.apply(p.update_position, args=(self.g_best, self.constricion_factor))
+                self.pool.apply_async(self.update_position, args=(p, self.constricion_factor))
 
             # Save current mean evaluation
             print('Step {}: Mean Evaluation {}'.format(counter, self.global_evaluation))
@@ -68,3 +69,31 @@ class CoPSO:
 
         self.pool.close()
         self.pool.join()
+
+    def update_position(self, particle, constriction_factor):
+        phi1 = random.random()
+        phi2 = random.random()
+
+        # Update epsilon velocity
+        velocity_epsilon = (particle.best_epsilon - particle.epsilon) * phi1 * 2.05 + \
+                           (self.g_best.best_epsilon - particle.epsilon) * phi2 * 2.05
+
+        # Update epsilon position
+        particle.epsilon = constriction_factor * (particle.epsilon + velocity_epsilon)
+
+        # Epsilon Constraint
+        if particle.epsilon < 0:
+            particle.epsilon = 0.1
+
+        # Update Min samples velocity
+        velocity_min_samples = (particle.best_min_samples - particle.min_samples) * phi1 + \
+                               (self.g_best.best_min_samples - particle.min_samples) * phi2
+
+        # Update Min samples position
+        particle.min_samples = int(constriction_factor * (particle.min_samples + velocity_min_samples))
+
+        # Min Samples Constraint
+        if particle.min_samples < 2:
+            particle.min_samples = 2
+        elif particle.min_samples > particle.data_size:
+            particle.min_samples = particle.data_size - 1
