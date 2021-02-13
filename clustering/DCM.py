@@ -1,5 +1,6 @@
 import numpy as np
 
+from clustering.PSOAlgorithm import PSOAlgorithm
 from si.pso.CoPSO import CoPSO
 from si.pso.PSO import PSO
 
@@ -17,7 +18,7 @@ class DCM:
         self.data = np.array(self.data)
 
     def optimization_engine(self):
-        if self.pso_algorithm is 1:
+        if self.pso_algorithm is PSOAlgorithm.DCMPSO:
             # TODO: Incluir parâmetros na Configuração DEFAULT
             pso50 = PSO(self.data, 50, 150, self.method)
             pso50.search()
@@ -34,7 +35,7 @@ class DCM:
                                         'PSO-DCM-100-gbest': pso100.gbest_evaluation_evolution,
                                         'PSO-DCM-200': pso200.mean_evaluation_evolution,
                                         'PSO-DCM-200-gbest': pso200.gbest_evaluation_evolution}
-        elif self.pso_algorithm is 2:
+        elif self.pso_algorithm is PSOAlgorithm.CoPSO:
             # TODO: Incluir parâmetros na Configuração DEFAULT
             pso50 = CoPSO(self.data, 50, 150, self.method)
             pso50.search()
