@@ -1,5 +1,6 @@
-from clustering.dynamicClustering import DCM
-from clustering.method import ClusteringMethod
+from clustering.PSOAlgorithm import PSOAlgorithm
+from clustering.DCM import DCM
+from clustering.ClusteringMethod import ClusteringMethod
 from config.network import Network
 from mobility.point import Point
 from network.bs import BS
@@ -54,7 +55,7 @@ for key in traffic_level:
         print(h.evaluation)
 
         # Instantiate DC Module with DBSCAM algorithm
-        dcm = DCM(ClusteringMethod.DBSCAN, h.ue_list)
+        dcm = DCM(ClusteringMethod.DBSCAN, PSOAlgorithm.DCMPSO, h.ue_list)
 
         # Run DCM
         dcm.optimization_engine()
