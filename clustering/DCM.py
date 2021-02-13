@@ -37,18 +37,8 @@ class DCM:
                                         'PSO-DCM-200-gbest': pso200.gbest_evaluation_evolution}
         elif self.pso_algorithm is PSOAlgorithm.CoPSO:
             # TODO: Incluir parâmetros na Configuração DEFAULT
-            pso50 = CoPSO(self.data, 50, 150, self.method)
-            pso50.search()
-
-            pso100 = CoPSO(self.data, 100, 150, self.method)
-            pso100.search()
-
             pso200 = CoPSO(self.data, 200, 150, self.method)
             pso200.search()
 
-            self.optimization_output = {'PSO-DCM-50': pso50.mean_evaluation_evolution,
-                                        'PSO-DCM-50-gbest': pso50.gbest_evaluation_evolution,
-                                        'PSO-DCM-100': pso100.mean_evaluation_evolution,
-                                        'PSO-DCM-100-gbest': pso100.gbest_evaluation_evolution,
-                                        'PSO-DCM-200': pso200.mean_evaluation_evolution,
-                                        'PSO-DCM-200-gbest': pso200.gbest_evaluation_evolution}
+            self.optimization_output = {'CoPSO-DCM-200': pso200.mean_evaluation_evolution,
+                                        'CoPSO-DCM-200-gbest': pso200.gbest_evaluation_evolution}
