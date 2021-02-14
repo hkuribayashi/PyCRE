@@ -2,13 +2,19 @@ import numpy as np
 import multiprocessing as mp
 
 
-def howmany_within_range(row, minimum, maximum):
+# Step 1: Redefine, to accept `i`, the iteration number
+def howmany_within_range2(i, row, minimum, maximum):
+    """Returns how many numbers lie within `maximum` and `minimum` in a given `row`"""
     count = 0
     for n in row:
         if minimum <= n <= maximum:
             count = count + 1
-    return count
+    return (i, count)
 
+# Step 2: Define callback function to collect the output in `results`
+def collect_result(result):
+    global results
+    results.append(result)
 
 # Prepare data
 np.random.RandomState(100)
@@ -16,13 +22,19 @@ arr = np.random.randint(0, 10, size=[200000, 5])
 data = arr.tolist()
 results = []
 
-# Parallelizing using Pool.apply()
-# Step 1: Init multiprocessing.Pool()
+# Parallel processing with Pool.apply_async()
 pool = mp.Pool(mp.cpu_count())
 
-# Step 2: `pool.apply` the `howmany_within_range()`
-results = [pool.apply(howmany_within_range, args=(row, 4, 8)) for row in data]
+# Step 3: Use loop to parallelize
+for i, row in enumerate(data):
+    pool.apply_async(howmany_within_range2, args=(i, row, 4, 8), callback=collect_result)
 
-# Step 3: Don't forget to close
+# Step 4: Close Pool and let all the processes complete
 pool.close()
-print(results[:10])
+pool.join()  # postpones the execution of next line of code until all processes in the queue are done.
+
+# Step 5: Sort results [OPTIONAL]
+results.sort(key=lambda x: x[0])
+results_final = [r for i, r in results]
+
+print(results_final[:10])

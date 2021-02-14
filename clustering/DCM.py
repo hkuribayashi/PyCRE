@@ -2,6 +2,7 @@ import numpy as np
 
 from clustering.PSOAlgorithm import PSOAlgorithm
 from si.pso.CoPSO import CoPSO
+from si.pso.IncreaseIWPSO import IncreaseIWPSO
 from si.pso.PSO import PSO
 
 
@@ -42,3 +43,17 @@ class DCM:
 
             self.optimization_output = {'CoPSO-DCM-200': pso200.mean_evaluation_evolution,
                                         'CoPSO-DCM-200-gbest': pso200.gbest_evaluation_evolution}
+        elif self.pso_algorithm is PSOAlgorithm.IncreaseIWPSO:
+            # TODO: Incluir parâmetros na Configuração DEFAULT
+            pso200 = IncreaseIWPSO(self.data, 200, 150, self.method)
+            pso200.search()
+
+            self.optimization_output = {'IncreaseIWPSO-DCM-200': pso200.mean_evaluation_evolution,
+                                        'IncreaseIWPSO-DCM-200-gbest': pso200.gbest_evaluation_evolution}
+        else:
+            # TODO: Incluir parâmetros na Configuração DEFAULT
+            pso200 = StochasticIWPSO(self.data, 200, 150, self.method)
+            pso200.search()
+
+            self.optimization_output = {'StochasticIWPSO-DCM-200': pso200.mean_evaluation_evolution,
+                                        'StochasticIWPSO-DCM-200-gbest': pso200.gbest_evaluation_evolution}
