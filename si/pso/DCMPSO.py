@@ -1,6 +1,6 @@
 from operator import attrgetter
 
-from si.pso.DCMParticle import DCMParticle
+from si.pso.DCMParticle import DCMPSOParticle
 from si.pso.PSO import PSO
 
 
@@ -16,7 +16,7 @@ class DCMPSO(PSO):
 
         # Create the PSO population
         for i in range(population_size):
-            self.population.append(DCMParticle(self.clustering_method, len(self.data), cognitive_factor))
+            self.population.append(DCMPSOParticle(self.clustering_method, len(self.data), cognitive_factor))
 
         # Initialize the inertia weight list
         initial_inertia = inertia_weight[0]
@@ -65,7 +65,7 @@ class DCMPSO(PSO):
                 size_excluded = len(self.population) - len(selected_population)
                 self.population = selected_population
                 for i in range(size_excluded):
-                    p = DCMParticle(self.clustering_method, len(self.data), self.cognitive_factor)
+                    p = DCMPSOParticle(self.clustering_method, len(self.data), self.cognitive_factor)
                     p.evaluate(self.data)
                     self.population.append(p)
 

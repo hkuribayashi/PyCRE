@@ -27,7 +27,7 @@ class DCM:
             self.optimization_output = {'DCMPSO-DCM-{}'.format(population_size): pso.mean_evaluation_evolution,
                                         'DCMPSO-DCM-{}-gbest'.format(population_size): pso.gbest_evaluation_evolution}
         elif self.pso_algorithm is PSOAlgorithm.CoPSO:
-            pso = CoPSO(self.data, population_size, max_steps, self.method)
+            pso = CoPSO(self.data, population_size, max_steps, self.method, [2.05, 2.05])
             pso.search()
             self.optimization_output = {'CoPSO-DCM-{}'.format(population_size): pso.mean_evaluation_evolution,
                                         'CoPSO-DCM-{}-gbest'.format(population_size): pso.gbest_evaluation_evolution}

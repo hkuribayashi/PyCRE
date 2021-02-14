@@ -1,6 +1,6 @@
 from operator import attrgetter
 
-from si.pso.IncreaseIWParticle import IncreaseIWParticle
+from si.pso.IncreaseIWParticle import IncreaseIWPSOParticle
 from si.pso.PSO import PSO
 
 
@@ -19,10 +19,10 @@ class IncreaseIWPSO(PSO):
 
         # Create the PSO population
         for i in range(population_size):
-            self.population.append(IncreaseIWParticle(self.clustering_method, len(self.data), cognitive_factor))
+            self.population.append(IncreaseIWPSOParticle(self.clustering_method, len(self.data), cognitive_factor))
 
     def search(self):
-        print("Starting DCMPSO Engine with {} particles and {} iterations".format(len(self.population), self.max_steps))
+        print("Starting IIWPSO Engine with {} particles and {} iterations".format(len(self.population), self.max_steps))
         counter = 0
         while counter < self.max_steps:
             # Evaluate the entire population
@@ -32,12 +32,12 @@ class IncreaseIWPSO(PSO):
             for p in self.population:
                 p.update_position(self.g_best, self.inertia_weight[counter])
 
-            # Save current mean evaluation
+            # Save current mean evaluation and gbest evaluation
             print('Iteration {}: Mean Evaluation {}'.format(counter, self.global_evaluation))
             self.mean_evaluation_evolution.append(self.global_evaluation)
-
-            # Save current gbest evaluation
-            print('Iteration {}: GBest Evaluation {}'.format(counter, self.g_best.evaluation))
             self.gbest_evaluation_evolution.append(self.g_best.evaluation)
+
+            print('Iteration {} - Mean Evaluation: {} | Gbest Evaluation: {}'.format(counter, self.global_evaluation,
+                                                                                     self.g_best.evaluation))
 
             counter += 1

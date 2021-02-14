@@ -2,7 +2,7 @@ from operator import attrgetter
 import multiprocessing as mp
 from random import random
 
-from si.pso.DCMParticle import Particle
+from si.pso.DCMParticle import PSOParticle
 
 
 class StochasticIWPSO:
@@ -22,7 +22,7 @@ class StochasticIWPSO:
 
         # Create the PSO population
         for i in range(population_size):
-            self.population.append(Particle(self.clustering_method, len(self.data)))
+            self.population.append(PSOParticle(self.clustering_method, len(self.data)))
 
         # Initialize the inertia weight list
         for step in range(max_steps):
