@@ -1,6 +1,6 @@
 from operator import attrgetter
 
-from si.pso.IncreaseIWParticle import IncreaseIWPSOParticle
+from si.pso.IncreaseIWPSOParticle import IncreaseIWPSOParticle
 from si.pso.PSO import PSO
 
 
@@ -33,7 +33,6 @@ class IncreaseIWPSO(PSO):
                 p.update_position(self.g_best, self.inertia_weight[counter])
 
             # Save current mean evaluation and gbest evaluation
-            print('Iteration {}: Mean Evaluation {}'.format(counter, self.global_evaluation))
             self.mean_evaluation_evolution.append(self.global_evaluation)
             self.gbest_evaluation_evolution.append(self.g_best.evaluation)
 

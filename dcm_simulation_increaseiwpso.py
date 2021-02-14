@@ -24,7 +24,9 @@ iterations = int(sys.argv[2])
 population_size = 200
 
 # Debug
-print("Running DCM with IncreaseIWPSO: {} simulations and {} particles".format(simulations, population_size))
+print("Running DCM with IncreaseIWPSO: {} simulations, {} iterations and {} particles".format(simulations,
+                                                                                              iterations,
+                                                                                              population_size))
 
 for key in traffic_level:
 
@@ -55,12 +57,12 @@ for key in traffic_level:
         dcm.optimization_engine(population_size, iterations)
 
         # Collect the generated results
-        mean_evolution[key].append(dcm.optimization_output['IIWPSO-DCM-{}'.format(population_size)])
-        mean_evolution[key].append(dcm.optimization_output['IIWPSO-DCM-{}-gbest'.format(population_size)])
+        mean_evolution[key].append(dcm.optimization_output['IIWPSO-{}'.format(population_size)])
+        mean_evolution[key].append(dcm.optimization_output['IIWPSO-{}-gbest'.format(population_size)])
 
     print("\n")
 
     save_to_csv(mean_evolution[key], Network.DEFAULT.dir_output_csv,
-                "mean_evolution_{}_pop_{}_IIWPSO-DCM.csv".format(key, population_size))
+                "mean_evolution_{}_pop_{}_IIWPSO.csv".format(key, population_size))
     save_to_csv(mean_evolution[key], Network.DEFAULT.dir_output_csv,
-                "mean_evolution_{}_pop_{}_gbest_IIWPSO-DCM.csv".format(key, population_size))
+                "mean_evolution_{}_pop_{}_gbest_IIWPSO.csv".format(key, population_size))

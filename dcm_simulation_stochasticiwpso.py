@@ -1,24 +1,41 @@
+import sys
+
 from clustering.PSOAlgorithm import PSOAlgorithm
 from clustering.DCM import DCM
 from clustering.ClusteringMethod import ClusteringMethod
+from config.network import Network
 from mobility.point import Point
 from network.bs import BS
 from network.hetnet import HetNet
 from utils.misc import save_to_csv
-from config.network import Network
 
 
-traffic_level = {'100': 999}
+traffic_level = {'10': 100, '60': 600, '100': 999}
+mean_evolution = {'10': [], '60': [], '100': []}
+gbest_evolution = {'10': [], '60': [], '100': []}
+
+# Get total simulations
+simulations = int(sys.argv[1])
+
+# Get total iterations
+iterations = int(sys.argv[2])
+
+# Population size
+population_size = 200
+
+# Debug
+print("Running DCM with StochasticIWPSO: {} simulations, {} iterations and {} particles".format(simulations,
+                                                                                                iterations,
+                                                                                                population_size))
 
 for key in traffic_level:
 
-    # Start the Dynamic Clustering Module variables
-    mean_evolution_list_100_pop_200 = []
-    mean_evolution_list_100_pop_200_gbest = []
+    print("Traffic Level: {}%".format(key))
 
     # TODO: Incluir o número de repetições na configuração DEFAULT
-    for idx in range(50):
-        print("Step: {}".format(idx))
+    for idx in range(simulations):
+        # Current Step
+        print("Simulation: {}".format(idx))
 
         # Instantiate a HetNet
         h = HetNet(Network.DEFAULT)
@@ -32,21 +49,20 @@ for key in traffic_level:
 
         # Run the HetNet
         h.run(traffic_level[key])
-        print(h.evaluation)
 
         # Instantiate DC Module with DBSCAM algorithm
         dcm = DCM(ClusteringMethod.DBSCAN, PSOAlgorithm.StochasticIWPSO, h.ue_list)
 
         # Run DCM
-        dcm.optimization_engine()
+        dcm.optimization_engine(population_size, iterations)
 
         # Collect the generated results
-        mean_evolution_list_100_pop_200.append(dcm.optimization_output['StochasticIWPSO-DCM-200'])
-        mean_evolution_list_100_pop_200_gbest.append(dcm.optimization_output['StochasticIWPSO-DCM-200-gbest'])
+        mean_evolution[key].append(dcm.optimization_output['SIWPSO-{}'.format(population_size)])
+        mean_evolution[key].append(dcm.optimization_output['SIWPSO-{}-gbest'.format(population_size)])
 
-    # Save the results in CSV files
-    # 100% of all UEs and 100 PSO particles
-    save_to_csv(mean_evolution_list_100_pop_200, Network.DEFAULT.dir_output_csv,
-                "mean_evolution_list_100_pop_200_stochasticiwpso.csv")
-    save_to_csv(mean_evolution_list_100_pop_200_gbest, Network.DEFAULT.dir_output_csv,
-                "mean_evolution_list_100_pop_200_gbest_stochasticiwpso.csv")
+    print("\n")
+
+    save_to_csv(mean_evolution[key], Network.DEFAULT.dir_output_csv,
+                "mean_evolution_{}_pop_{}_SIWPSO.csv".format(key, population_size))
+    save_to_csv(mean_evolution[key], Network.DEFAULT.dir_output_csv,
+                "mean_evolution_{}_pop_{}_gbest_SIWPSO.csv".format(key, population_size))

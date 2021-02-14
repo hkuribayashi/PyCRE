@@ -21,6 +21,10 @@ iterations = int(sys.argv[2])
 # Get population size
 population_size = int(sys.argv[3])
 
+# Debug
+print("Running DCM with DCMPSO: {} simulations, {} iterations and {} particles".format(simulations, iterations,
+                                                                                       population_size))
+
 for key in traffic_level:
 
     # Debug
@@ -55,8 +59,8 @@ for key in traffic_level:
         dcm.optimization_engine(population_size, iterations)
 
         # Collect the generated results
-        mean_evolution.append(dcm.optimization_output['DCMPSO-DCM-{}'.format(population_size)])
-        mean_evolution.append(dcm.optimization_output['DCMPSO-DCM-{}-gbest'.format(population_size)])
+        mean_evolution.append(dcm.optimization_output['DCMPSO-{}'.format(population_size)])
+        mean_evolution.append(dcm.optimization_output['DCMPSO-{}-gbest'.format(population_size)])
 
     print("\n")
 

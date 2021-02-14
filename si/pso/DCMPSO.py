@@ -1,6 +1,6 @@
 from operator import attrgetter
 
-from si.pso.DCMParticle import DCMPSOParticle
+from si.pso.DCMPSOParticle import DCMPSOParticle
 from si.pso.PSO import PSO
 
 
@@ -11,7 +11,7 @@ class DCMPSO(PSO):
         self.inertia_weight = []
         self.mean_evaluation_evolution = []
         self.gbest_evaluation_evolution = []
-        self.last_evaluation = 10.0
+        self.last_evaluation = 1.0
         self.cognitive_factor = cognitive_factor
 
         # Create the PSO population
