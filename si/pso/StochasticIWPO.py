@@ -4,7 +4,7 @@ import multiprocessing as mp
 from si.pso.particle import Particle
 
 
-class StochasticIWPS:
+class StochasticIWPSO:
 
     def __init__(self, data, population_size, max_steps, clustering_method):
         self.population = list()

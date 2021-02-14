@@ -1,15 +1,14 @@
 from clustering.PSOAlgorithm import PSOAlgorithm
 from clustering.DCM import DCM
 from clustering.ClusteringMethod import ClusteringMethod
-from config.network import Network
 from mobility.point import Point
 from network.bs import BS
 from network.hetnet import HetNet
 from utils.misc import save_to_csv
+from config.network import Network
 
 
 traffic_level = {'100': 999}
-path = "/Users/hugo/Desktop/PyCRE/csv/"
 
 for key in traffic_level:
 
@@ -19,6 +18,8 @@ for key in traffic_level:
 
     # TODO: Incluir o número de repetições na configuração DEFAULT
     for idx in range(50):
+        print("Step: {}".format(idx))
+
         # Instantiate a HetNet
         h = HetNet(Network.DEFAULT)
 
@@ -45,5 +46,7 @@ for key in traffic_level:
 
     # Save the results in CSV files
     # 100% of all UEs and 100 PSO particles
-    save_to_csv(mean_evolution_list_100_pop_200, path, "mean_evolution_list_100_pop_200_copso.csv")
-    save_to_csv(mean_evolution_list_100_pop_200_gbest, path, "mean_evolution_list_100_pop_200_gbest_copso.csv")
+    save_to_csv(mean_evolution_list_100_pop_200, Network.DEFAULT.dir_output_csv,
+                "mean_evolution_list_100_pop_200_copso.csv")
+    save_to_csv(mean_evolution_list_100_pop_200_gbest, Network.DEFAULT.dir_output_csv,
+                "mean_evolution_list_100_pop_200_gbest_copso.csv")

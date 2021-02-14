@@ -4,6 +4,7 @@ from clustering.PSOAlgorithm import PSOAlgorithm
 from si.pso.CoPSO import CoPSO
 from si.pso.IncreaseIWPSO import IncreaseIWPSO
 from si.pso.PSO import PSO
+from si.pso.StochasticIWPO import StochasticIWPSO
 
 
 class DCM:
