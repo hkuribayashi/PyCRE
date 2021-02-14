@@ -1,5 +1,6 @@
 from operator import attrgetter
 import multiprocessing as mp
+from random import random
 
 from si.pso.particle import Particle
 
@@ -24,11 +25,8 @@ class StochasticIWPSO:
             self.population.append(Particle(self.clustering_method, len(self.data)))
 
         # Initialize the inertia weight list
-        initial_inertia = 0.6
-        final_inertia = 0.9
         for step in range(max_steps):
-            current_inertia = initial_inertia + ((step/max_steps)*(final_inertia - initial_inertia))
-            self.inertia_weight.append(current_inertia)
+            self.inertia_weight.append(random.uniform(0.5, 1.0))
 
     def evaluate(self):
         # Initialize aux variable
