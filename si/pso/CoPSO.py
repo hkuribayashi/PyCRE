@@ -1,14 +1,9 @@
 import random
 import numpy as np
 from operator import attrgetter
-import multiprocessing as mp
 
-from si.pso.CoPsoParticle import CoPsoParticle
+from si.pso.CoPSOParticle import CoPsoParticle
 
-# Step 2: Define callback function to collect the output in `results`
-def collect_result(result):
-    global results
-    results.append(result)
 
 class CoPSO:
 
@@ -22,7 +17,6 @@ class CoPSO:
         self.mean_evaluation_evolution = []
         self.gbest_evaluation_evolution = []
         self.constricion_factor = None
-        self.pool = mp.Pool(mp.cpu_count())
 
         # Create the PSO population
         for i in range(population_size):
@@ -57,8 +51,7 @@ class CoPSO:
 
             # Update the particles' position
             for p in self.population:
-                # p.update_position(self.g_best, self.constricion_factor)
-                self.pool.apply_async(self.update_position, args=(p, self.constricion_factor), callback=collect_result)
+                p.update_position(self.g_best, self.constricion_factor)
 
             # Save current mean evaluation
             print('Step {}: Mean Evaluation {}'.format(counter, self.global_evaluation))

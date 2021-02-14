@@ -11,8 +11,6 @@ from utils.misc import save_to_csv
 
 
 traffic_level = {'10': 100, '60': 600, '100': 999}
-mean_evolution = {'10': [], '60': [], '100': []}
-gbest_evolution = {'10': [], '60': [], '100': []}
 
 # Get total simulations
 simulations = int(sys.argv[1])
@@ -20,15 +18,17 @@ simulations = int(sys.argv[1])
 # Get total iterations
 iterations = int(sys.argv[2])
 
-# Population size
-population_size = 200
-
-# Debug
-print("Running DCM with IncreaseIWPSO: {} simulations and {} particles".format(simulations, population_size))
+# Get population size
+population_size = int(sys.argv[3])
 
 for key in traffic_level:
 
+    # Debug
     print("Traffic Level: {}%".format(key))
+
+    # Initialize the result variables
+    mean_evolution = []
+    gbest_evolution = []
 
     # TODO: Incluir o número de repetições na configuração DEFAULT
     for idx in range(simulations):
@@ -49,18 +49,18 @@ for key in traffic_level:
         h.run(traffic_level[key])
 
         # Instantiate DC Module with DBSCAM algorithm
-        dcm = DCM(ClusteringMethod.DBSCAN, PSOAlgorithm.IncreaseIWPSO, h.ue_list)
+        dcm = DCM(ClusteringMethod.DBSCAN, PSOAlgorithm.DCMPSO, h.ue_list)
 
         # Run DCM
         dcm.optimization_engine(population_size, iterations)
 
         # Collect the generated results
-        mean_evolution[key].append(dcm.optimization_output['IIWPSO-DCM-{}'.format(population_size)])
-        mean_evolution[key].append(dcm.optimization_output['IIWPSO-DCM-{}-gbest'.format(population_size)])
+        mean_evolution.append(dcm.optimization_output['DCMPSO-DCM-{}'.format(population_size)])
+        mean_evolution.append(dcm.optimization_output['DCMPSO-DCM-{}-gbest'.format(population_size)])
 
     print("\n")
 
-    save_to_csv(mean_evolution[key], Network.DEFAULT.dir_output_csv,
-                "mean_evolution_{}_pop_{}_IIWPSO-DCM.csv".format(key, population_size))
-    save_to_csv(mean_evolution[key], Network.DEFAULT.dir_output_csv,
-                "mean_evolution_{}_pop_{}_gbest_IIWPSO-DCM.csv".format(key, population_size))
+    save_to_csv(mean_evolution, Network.DEFAULT.dir_output_csv,
+                "mean_evolution_{}_pop_{}_DCMPSO.csv".format(key, population_size))
+    save_to_csv(mean_evolution, Network.DEFAULT.dir_output_csv,
+                "mean_evolution_{}_pop_{}_gbest_DCMPSO.csv".format(key, population_size))

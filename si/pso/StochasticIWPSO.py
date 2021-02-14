@@ -2,7 +2,7 @@ from operator import attrgetter
 import multiprocessing as mp
 from random import random
 
-from si.pso.particle import Particle
+from si.pso.DCMParticle import Particle
 
 
 class StochasticIWPSO:

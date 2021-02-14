@@ -1,19 +1,25 @@
 import random
+from abc import ABC, abstractmethod
+import numpy as np
 
 from sklearn.cluster import DBSCAN
 from sklearn.metrics import davies_bouldin_score
 
+from config.network import Network
 
-class Particle:
 
-    def __init__(self, clustering_method, data_size):
-        self.epsilon = random.randint(1, 1000)
+class Particle(ABC):
+
+    def __init__(self, clustering_method, data_size, cognitive_factor):
+        self.epsilon = random.randint(1, np.sqrt(Network.DEFAULT.simulation_area))
         self.best_epsilon = self.epsilon
         self.min_samples = random.randint(2, data_size - 1)
         self.best_min_samples = self.min_samples
         self.evaluation = 10.0
         self.data_size = data_size
         self.clustering_method = clustering_method
+        self.c1 = cognitive_factor[0]
+        self.c2 = cognitive_factor[1]
 
     def evaluate(self, data):
         # TODO: Add more clustering methods
@@ -39,8 +45,8 @@ class Particle:
         phi2 = random.random()
 
         # Update epsilon velocity
-        velocity_epsilon = (self.best_epsilon - self.epsilon) * phi1 * 2.05 + \
-                           (g_best.best_epsilon - self.epsilon) * phi2 * 2.05
+        velocity_epsilon = (self.best_epsilon - self.epsilon) * phi1 * self.c1 + \
+                           (g_best.best_epsilon - self.epsilon) * phi2 * self.c2
 
         # Update epsilon position
         self.epsilon = self.epsilon + (inertia_weight * velocity_epsilon)
@@ -61,3 +67,4 @@ class Particle:
             self.min_samples = 2
         elif self.min_samples > self.data_size:
             self.min_samples = self.data_size - 1
+

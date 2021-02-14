@@ -6,7 +6,7 @@ import numpy as np
 # df.columns = ['User_ID', 'Venue_ID', 'Venue_category_ID', 'Venue_category_name', 'Latitude', 'Longitude', 'Timezone', 'UTC']
 # df['UTC'] = pd.to_datetime(df['UTC'])
 # df.to_csv('/Users/hugo/Downloads/dataset_NYC.txt', index=True, sep ='\t')
-from si.pso.PSO import PSO
+from si.pso.IncreaseIWPSO import PSO
 from utils.charts import get_visual_cluster
 
 df = pd.read_csv('/Users/hugo/Downloads/dataset_NYC.txt', sep ='\t')

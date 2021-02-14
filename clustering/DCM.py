@@ -3,8 +3,8 @@ import numpy as np
 from clustering.PSOAlgorithm import PSOAlgorithm
 from si.pso.CoPSO import CoPSO
 from si.pso.IncreaseIWPSO import IncreaseIWPSO
-from si.pso.PSO import PSO
 from si.pso.StochasticIWPSO import StochasticIWPSO
+from si.pso.DCMPSO import DCMPSO
 
 
 class DCM:
@@ -19,42 +19,25 @@ class DCM:
             self.data.append([ue.point.x, ue.point.y])
         self.data = np.array(self.data)
 
-    def optimization_engine(self):
+    # TODO: Incluir parametros na configuração DEFAULT
+    def optimization_engine(self, population_size, max_steps=150):
         if self.pso_algorithm is PSOAlgorithm.DCMPSO:
-            # TODO: Incluir parâmetros na Configuração DEFAULT
-            pso50 = PSO(self.data, 50, 150, self.method)
-            pso50.search()
-
-            pso100 = PSO(self.data, 100, 150, self.method)
-            pso100.search()
-
-            pso200 = PSO(self.data, 200, 150, self.method)
-            pso200.search()
-
-            self.optimization_output = {'PSO-DCM-50': pso50.mean_evaluation_evolution,
-                                        'PSO-DCM-50-gbest': pso50.gbest_evaluation_evolution,
-                                        'PSO-DCM-100': pso100.mean_evaluation_evolution,
-                                        'PSO-DCM-100-gbest': pso100.gbest_evaluation_evolution,
-                                        'PSO-DCM-200': pso200.mean_evaluation_evolution,
-                                        'PSO-DCM-200-gbest': pso200.gbest_evaluation_evolution}
+            pso = DCMPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
+            pso.search()
+            self.optimization_output = {'DCMPSO-DCM-{}'.format(population_size): pso.mean_evaluation_evolution,
+                                        'DCMPSO-DCM-{}-gbest'.format(population_size): pso.gbest_evaluation_evolution}
         elif self.pso_algorithm is PSOAlgorithm.CoPSO:
-            # TODO: Incluir parâmetros na Configuração DEFAULT
-            pso200 = CoPSO(self.data, 200, 150, self.method)
-            pso200.search()
-
-            self.optimization_output = {'CoPSO-DCM-200': pso200.mean_evaluation_evolution,
-                                        'CoPSO-DCM-200-gbest': pso200.gbest_evaluation_evolution}
+            pso = CoPSO(self.data, population_size, max_steps, self.method)
+            pso.search()
+            self.optimization_output = {'CoPSO-DCM-{}'.format(population_size): pso.mean_evaluation_evolution,
+                                        'CoPSO-DCM-{}-gbest'.format(population_size): pso.gbest_evaluation_evolution}
         elif self.pso_algorithm is PSOAlgorithm.IncreaseIWPSO:
-            # TODO: Incluir parâmetros na Configuração DEFAULT
-            pso200 = IncreaseIWPSO(self.data, 200, 150, self.method)
-            pso200.search()
-
-            self.optimization_output = {'IncreaseIWPSO-DCM-200': pso200.mean_evaluation_evolution,
-                                        'IncreaseIWPSO-DCM-200-gbest': pso200.gbest_evaluation_evolution}
-        else:
-            # TODO: Incluir parâmetros na Configuração DEFAULT
-            pso200 = StochasticIWPSO(self.data, 200, 150, self.method)
-            pso200.search()
-
-            self.optimization_output = {'StochasticIWPSO-DCM-200': pso200.mean_evaluation_evolution,
-                                        'StochasticIWPSO-DCM-200-gbest': pso200.gbest_evaluation_evolution}
+            pso = IncreaseIWPSO(self.data, population_size, max_steps, self.method, [0.4, 0.9], [2.0, 2.0])
+            pso.search()
+            self.optimization_output = {'IIWPSO-DCM-{}'.format(population_size): pso.mean_evaluation_evolution,
+                                        'IIWPSO-DCM-{}-gbest'.format(population_size): pso.gbest_evaluation_evolution}
+        elif self.pso_algorithm is PSOAlgorithm.StochasticIWPSO:
+            pso = StochasticIWPSO(self.data, population_size, max_steps, self.method)
+            pso.search()
+            self.optimization_output = {'SIWPSO-DCM-{}'.format(population_size): pso.mean_evaluation_evolution,
+                                        'SIWPSO-DCM-{}-gbest'.format(population_size): pso.gbest_evaluation_evolution}
