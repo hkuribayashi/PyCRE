@@ -60,11 +60,11 @@ for key in traffic_level:
 
         # Collect the generated results
         mean_evolution.append(dcm.optimization_output['DCMPSO-{}'.format(population_size)])
-        mean_evolution.append(dcm.optimization_output['DCMPSO-{}-gbest'.format(population_size)])
+        gbest_evolution.append(dcm.optimization_output['DCMPSO-{}-gbest'.format(population_size)])
 
     print("\n")
 
     save_to_csv(mean_evolution, Network.DEFAULT.dir_output_csv,
                 "mean_evolution_{}_pop_{}_DCMPSO.csv".format(key, population_size))
-    save_to_csv(mean_evolution, Network.DEFAULT.dir_output_csv,
+    save_to_csv(gbest_evolution, Network.DEFAULT.dir_output_csv,
                 "mean_evolution_{}_pop_{}_gbest_DCMPSO.csv".format(key, population_size))

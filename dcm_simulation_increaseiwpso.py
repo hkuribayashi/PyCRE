@@ -58,11 +58,11 @@ for key in traffic_level:
 
         # Collect the generated results
         mean_evolution[key].append(dcm.optimization_output['IIWPSO-{}'.format(population_size)])
-        mean_evolution[key].append(dcm.optimization_output['IIWPSO-{}-gbest'.format(population_size)])
+        gbest_evolution[key].append(dcm.optimization_output['IIWPSO-{}-gbest'.format(population_size)])
 
     print("\n")
 
     save_to_csv(mean_evolution[key], Network.DEFAULT.dir_output_csv,
                 "mean_evolution_{}_pop_{}_IIWPSO.csv".format(key, population_size))
-    save_to_csv(mean_evolution[key], Network.DEFAULT.dir_output_csv,
+    save_to_csv(gbest_evolution[key], Network.DEFAULT.dir_output_csv,
                 "mean_evolution_{}_pop_{}_gbest_IIWPSO.csv".format(key, population_size))
