@@ -49,14 +49,16 @@ def get_visual(hetnet):
     plt.show()
 
 
-def get_evaluation_evolution(data, filename, marker=''):
+def get_evaluation_evolution(data, filename, marker='', xlim=None):
     for key in data:
-        plt.plot(data[key], marker, label=key, markersize=2.2)
+        plt.plot(data[key][5:149], marker, label=key, markersize=2.2)
 
     plt.xlabel('Iterations')
     plt.ylabel('Davies-Bouldin Index')
     plt.grid(linestyle=':')
     plt.legend(loc='best')
+    if xlim is not None:
+        plt.xlim(xlim)
 
     plt.savefig('{}{}'.format(Network.DEFAULT.dir_output_images, filename), dpi=Network.DEFAULT.image_resolution,
                 bbox_inches='tight')

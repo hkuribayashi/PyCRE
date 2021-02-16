@@ -52,7 +52,7 @@ class DCMPSO(PSO):
         while counter < self.max_steps:
             current_global_evaluation, current_gbest_evaluation = self.evaluate()
             # TODO: Incluir parâmetro 0.001 na Configuração DEFAULT
-            if abs(current_global_evaluation - self.last_evaluation) < 0.001 or abs(current_gbest_evaluation - self.last_gbest_evaluation) < 0.001:
+            if abs(current_global_evaluation - self.last_evaluation) < 0.001 and abs(current_gbest_evaluation - self.last_gbest_evaluation) < 0.001:
                 k += 1
 
             # Update the variables
@@ -62,7 +62,7 @@ class DCMPSO(PSO):
 
             # Replace part of the population which is below the mean evaluation
             # TODO: Incluir parâmetro k na Configuração DEFAULT
-            if k >= 15:
+            if k >= 10:
                 k = 0
                 # counter -= 5
                 selected_population = [p for p in self.population if p.evaluation <= current_global_evaluation]
