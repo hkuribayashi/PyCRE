@@ -1,8 +1,7 @@
-
-
 from si.gwo.MOGWO import MOGWO
 
-mo = MOGWO(100, 100, 20)
+mo = MOGWO(150, 100, 10)
 mo.search()
 
 mo.get_archive()
+

@@ -8,25 +8,27 @@ class MOGWOSegment:
             if len(self.archive) is 0:
                 self.archive.append(p)
             else:
-                list_add = []
                 list_del = []
-                for other_p in self.archive:
-                    if p < other_p:
-                        list_add.append(p)
-                        list_del.append(other_p)
-                    elif p.evaluation_f1 < other_p.evaluation_f1 or p.evaluation_f2 < other_p.evaluation_f2:
-                        list_add.append(p)
-                for id_del in list_del:
-                    self.archive.remove(id_del)
-                for id_add in list_add:
-                    self.archive.append(id_add)
+                flag = False
+                for non_dominated in self.archive:
+                    if p <= non_dominated:
+                        flag = True
+                        list_del.append(non_dominated)
+                    elif p.evaluation_f1 <= non_dominated.evaluation_f1 or p.evaluation_f2 <= non_dominated.evaluation_f2:
+                        flag = True
+                    else:
+                        flag = False
+                for element in list_del:
+                    self.archive.remove(element)
+                if flag:
+                    self.archive.append(p)
             self.archive = list(set(self.archive))
-        else:
             return False
-
+        else:
+            return True
 
     def __str__(self):
         str_return = ""
         for p in self.archive:
-             str_return = str_return + p
+            str_return = str_return + p
         return "[" + str_return + "]"

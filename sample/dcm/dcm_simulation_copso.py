@@ -64,4 +64,4 @@ for key in traffic_level:
     save_to_csv(mean_evolution[key], Network.DEFAULT.dir_output_csv,
                 "mean_evolution_{}_pop_{}_CoPSO.csv".format(key, population_size))
     save_to_csv(mean_evolution[key], Network.DEFAULT.dir_output_csv,
-                "gbest_evolution_{}_pop_{}_gbest_CoPSO.csv".format(key, population_size))
+                "mean_evolution_{}_pop_{}_gbest_CoPSO.csv".format(key, population_size))

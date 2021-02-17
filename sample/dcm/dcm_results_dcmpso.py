@@ -1,19 +1,20 @@
+from config.network import Network
 from utils.charts import get_evaluation_evolution
 from utils.misc import consolidate_results
 
-path = "/Users/hugo/Downloads/PyCRE/csv/"
 
 traffic_level = {'10': 100, '60': 600, '100': 999}
 population_size = [50, 100, 200]
 chart_data = {}
 
 # Plot mean evalution evolution
+global mean_data
 for key in traffic_level:
     chart_data = {}
     for population in population_size:
         csv_filename = 'mean_evolution_{}_pop_{}_DCMPSO.csv'.format(key, population)
         try:
-            mean_data = consolidate_results(path, csv_filename)
+            mean_data = consolidate_results(Network.DEFAULT.dir_output_csv, csv_filename)
         except FileNotFoundError:
             mean_data = []
         finally:

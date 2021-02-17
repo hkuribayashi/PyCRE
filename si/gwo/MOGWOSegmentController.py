@@ -6,22 +6,19 @@ from si.gwo.MOGWOSegment import MOGWOSegment
 
 class MOGWOSegmentController:
 
-    def __init__(self, n_segments, population):
+    def __init__(self, n_segments, non_dominated_solutions):
         self.segments = {}
         self.probability = {}
         self.n_segments = n_segments
         for idx in range(n_segments):
-            self.segments[idx] = MOGWOSegment(10)
+            self.segments[idx] = MOGWOSegment(100)
             self.probability[idx] = 0.0
-
-        for p in population:
-            key = random.randint(0, n_segments-1)
-            self.segments[key].add_solution(p)
+            self.segments[idx].archive = non_dominated_solutions[idx]
 
     def select_leader(self):
         for key in self.segments:
             if len(self.segments[key].archive) > 0:
-                self.probability[key] = 3 - len(self.segments[key].archive)
+                self.probability[key] = 100 - len(self.segments[key].archive)
             else:
                 self.probability[key] = 0
         selected_key_segment = random.choices(list(self.segments.keys()), weights=list(self.probability.values()), k=1)

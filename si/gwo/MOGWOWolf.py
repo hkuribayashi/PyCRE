@@ -26,8 +26,8 @@ def constraint_verification(base_radius, slant_height):
 class MOGWOWolf:
     def __init__(self, idx):
         self.idx = idx
-        self.base_radius = random.randint(1, 10)
-        self.slant_height = random.randint(1, 20)
+        self.base_radius = random.uniform(0.001, 10.0)
+        self.slant_height = random.uniform(0.001, 20.0)
         self.evaluation_f1 = float('inf')
         self.evaluation_f2 = float('inf')
         self.volume = 0.0
@@ -56,3 +56,6 @@ class MOGWOWolf:
     @total_ordering
     def __lt__(self, other):
         return self.evaluation_f1 < other.evaluation_f1 and self.evaluation_f2 < other.evaluation_f2
+
+    def __le__(self, other):
+        return self.evaluation_f1 <= other.evaluation_f1 and self.evaluation_f2 <= other.evaluation_f2

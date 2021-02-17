@@ -1,7 +1,32 @@
+import copy
 import random
+import numpy as np
 
 from si.gwo.MOGWOSegmentController import MOGWOSegmentController
 from si.gwo.MOGWOWolf import MOGWOWolf
+
+
+def find_nondominated_solutions(populacao):
+    non_dominated_list = [copy.deepcopy(populacao[0])]
+
+    for p in populacao:
+        non_dominated_list = list(set(non_dominated_list))
+        list_del = []
+        flag = False
+        for non_dominated in non_dominated_list:
+            if p <= non_dominated:
+                flag = True
+                list_del.append(non_dominated)
+            elif p.evaluation_f1 <= non_dominated.evaluation_f1 or p.evaluation_f2 <= non_dominated.evaluation_f2:
+                flag = True
+            else:
+                flag = False
+        for element in list_del:
+            non_dominated_list.remove(element)
+        if flag:
+            non_dominated_list.append(copy.deepcopy(p))
+
+    return list(set(non_dominated_list))
 
 
 class MOGWO:
@@ -22,8 +47,19 @@ class MOGWO:
         # Calculate the fitness of each search agent
         self.evaluate()
 
-        # Find the non-dominated solutions and initialized the archive with them
-        self.segment_controller = MOGWOSegmentController(n_segments, self.population)
+        # Find the non-dominated solutions
+        non_dominatead_solutions_set = []
+        for seg in range(n_segments):
+            population_ = []
+            for idx in range(population_size):
+                p_ = MOGWOWolf(idx)
+                p_.evaluate()
+                population_.append(p_)
+            non_dominatead_solutions = find_nondominated_solutions(population_)
+            non_dominatead_solutions_set.append(non_dominatead_solutions)
+
+        # Initialize the archive with the non-dominated solutions
+        self.segment_controller = MOGWOSegmentController(n_segments, non_dominatead_solutions_set)
 
         # Select the alpha leader
         self.alpha, alpha_segment_id = self.segment_controller.select_leader()
@@ -42,30 +78,6 @@ class MOGWO:
     def evaluate(self):
         for p in self.population:
             p.evaluate()
-
-    def find_nondominated_solutions(self):
-        non_dominated = []
-        for idx, p in enumerate(self.population):
-            if len(non_dominated) is 0:
-                non_dominated.append(p)
-            else:
-                list_add = []
-                list_del = []
-                for other_p_id, other_p in enumerate(non_dominated):
-                    if p < other_p:
-                        # non_dominated.append(p)
-                        list_add.append(p)
-                        # non_dominated.remove(other_p)
-                        list_del.append(other_p)
-                    elif p.evaluation_f1 < other_p.evaluation_f1 or p.evaluation_f2 < other_p.evaluation_f2:
-                        # non_dominated.append(p)
-                        list_add.append(p)
-                for id_del in list_del:
-                    non_dominated.remove(id_del)
-                for id_add in list_add:
-                    non_dominated.append(id_add)
-
-        return list(set(non_dominated))
 
     def search(self):
         counter = 0
@@ -124,13 +136,13 @@ class MOGWO:
                 # Checking constrainsts
                 # Base Radius Constraint
                 if mean_base_radius <= 0:
-                    mean_base_radius = 0.1
+                    mean_base_radius = 0.001
                 elif mean_base_radius > 10:
                     mean_base_radius = 10.0
 
                 # Slant Height Constraint
                 if mean_slant_height <= 0:
-                    mean_slant_height = 0.1
+                    mean_slant_height = 0.001
                 elif mean_slant_height > 20:
                     mean_slant_height = 20.0
 
@@ -141,30 +153,24 @@ class MOGWO:
             self.evaluate()
 
             # Find the non-dominated solutions
-            non_dominated_list = self.find_nondominated_solutions()
+            non_dominated_list = find_nondominated_solutions(self.population)
 
             # Update the archive with respect to the obtained non-dominated solutions
             self.segment_controller.update(non_dominated_list)
 
             # Select the alpha leader
-            temp_alpha, alpha_segment_id = self.segment_controller.select_leader()
-            if temp_alpha < self.alpha:
-                self.alpha = temp_alpha
+            self.alpha, alpha_segment_id = self.segment_controller.select_leader()
 
             # Select the beta leader
-            temp_beta, beta_segment_id = self.segment_controller.select_leader()
-            if temp_beta < self.beta:
-                self.beta = temp_beta
+            self.beta, beta_segment_id = self.segment_controller.select_leader()
 
             # Select the delta leader
-            temp_delta, delta_segment_id = self.segment_controller.select_leader()
-            if temp_delta < self.delta:
-                self.delta = temp_delta
+            self.delta, delta_segment_id = self.segment_controller.select_leader()
 
             # Add back alpha, beta and delta to the archive
-            self.segment_controller.add_leader(alpha_segment_id, temp_alpha)
-            self.segment_controller.add_leader(beta_segment_id, temp_beta)
-            self.segment_controller.add_leader(delta_segment_id, temp_delta)
+            self.segment_controller.add_leader(alpha_segment_id, self.alpha)
+            self.segment_controller.add_leader(beta_segment_id, self.beta)
+            self.segment_controller.add_leader(delta_segment_id, self.delta)
 
             counter += 1
 
@@ -173,3 +179,10 @@ class MOGWO:
             print("Segment ID: {}".format(key))
             for p in self.segment_controller.segments[key].archive:
                 print(p)
+        print("\n")
+        for key in self.segment_controller.segments:
+            print("Segment ID: {}".format(key))
+            for p in self.segment_controller.segments[key].archive:
+                p.evaluate()
+                print(p)
+                print (np.pi * p.base_radius * np.sqrt(p.base_radius ** 2 + p.slant_height ** 2))
