@@ -1,15 +1,15 @@
-import string
 from enum import Enum
 
 
 class Network(Enum):
 
-    DEFAULT = (1000000.0, 20.0, 46.0, 32.0, -174.0, 35.0, 0.0, 5.0, 5.0, 1.0, 12.0, 14.0, 1.0, 80.0, -30.0,
-               '/Users/hugo/Desktop/PyCRE/images/', 600, '/Users/hugo/Desktop/PyCRE/csv/')
+    DEFAULT = (1000000.0, 20.0, 46.0, 32.0, -174.0, 35.0, 0.0, 5.0, 5.0, 1.0, 12.0, 14.0, 1.0, 80.0, -30.0, 600, 4, 1,
+               1000, 0.2, 50, 20, 1, 1, 1.5)
 
     def __init__(self, simulation_area, bandwidth, mbs_power, sbs_power, noise_power, mbs_height, sbs_height, mbs_gain,
                  sbs_gain, ue_height, number_subcarriers, number_ofdm_symbols, subframe_duration, max_bias, min_bias,
-                 dir_output_images, image_resolution, dir_output_csv):
+                 image_resolution, ue_arrival_rate, ue_service_rate, total_time_steps, priority_ue_proportion,
+                 max_ue_per_mbs, max_ue_per_sbs, max_bs_per_ue, ordinary_ues_weight, priority_ues_weight):
 
         if simulation_area < 0 or simulation_area is None:
             raise RuntimeError('Incorrect value for parameter simulation_area: {}'.format(simulation_area))
@@ -87,20 +87,56 @@ class Network(Enum):
         else:
             self._min_bias = min_bias
 
-        if dir_output_images is None:
-            raise RuntimeError('Incorrect value for parameter dir_output_images: {}'.format(dir_output_images))
-        else:
-            self._dir_output_images = dir_output_images
-
         if image_resolution is None:
             raise RuntimeError('Incorrect value for parameter image_resolution: {}'.format(image_resolution))
         else:
             self._image_resolution = image_resolution
 
-        if dir_output_csv is None:
-            raise RuntimeError('Incorrect value for parameter dir_output_csv: {}'.format(dir_output_csv))
+        if ue_arrival_rate < 0 or ue_arrival_rate is None:
+            raise RuntimeError('Incorrect value for ue_arrival_rate parameter: {}'.format(ue_arrival_rate))
         else:
-            self._dir_output_csv = dir_output_csv
+            self._ue_arrival_rate = ue_arrival_rate
+
+        if ue_service_rate < 0 or ue_service_rate is None:
+            raise RuntimeError('Incorrect value for ue_service_rate parameter: {}'.format(ue_service_rate))
+        else:
+            self._ue_service_rate = ue_service_rate
+
+        if total_time_steps < 0 or total_time_steps is None:
+            raise RuntimeError('Incorrect value for total_time_steps parameter: {}'.format(total_time_steps))
+        else:
+            self._total_time_steps = total_time_steps
+
+        if priority_ue_proportion < 0 or priority_ue_proportion > 1:
+            raise RuntimeError(
+                'Incorrect value for priority_ue_proportion parameter: {}'.format(priority_ue_proportion))
+        else:
+            self._priority_ue_proportion = priority_ue_proportion
+
+        if max_ue_per_mbs < 0 or max_ue_per_mbs is None:
+            raise RuntimeError('Incorrect value for parameter max_ue_per_mbs: {}'.format(max_ue_per_mbs))
+        else:
+            self._max_ue_per_mbs = max_ue_per_mbs
+
+        if max_ue_per_sbs < 0 or max_ue_per_sbs is None:
+            raise RuntimeError('Incorrect value for parameter max_ue_per_sbs: {}'.format(max_ue_per_sbs))
+        else:
+            self._max_ue_per_sbs = max_ue_per_sbs
+
+        if max_bs_per_ue < 0 or max_bs_per_ue is None:
+            raise RuntimeError('Incorrect value for parameter max_bs_per_ue: {}'.format(max_bs_per_ue))
+        else:
+            self._max_bs_per_ue = max_bs_per_ue
+
+        if ordinary_ues_weight < 0 or ordinary_ues_weight is None:
+            raise RuntimeError('Incorrect value for parameter ordinary_ues_weight: {}'.format(ordinary_ues_weight))
+        else:
+            self._ordinary_ues_weight = ordinary_ues_weight
+
+        if priority_ues_weight < 0 or priority_ues_weight is None:
+            raise RuntimeError('Incorrect value for parameter priority_ues_weight: {}'.format(priority_ues_weight))
+        else:
+            self._priority_ues_weight = priority_ues_weight
 
     @property
     def simulation_area(self):
@@ -163,13 +199,41 @@ class Network(Enum):
         return self._min_bias
 
     @property
-    def dir_output_images(self):
-        return self._dir_output_images
-
-    @property
     def image_resolution(self):
         return self._image_resolution
 
     @property
-    def dir_output_csv(self):
-        return self._dir_output_csv
+    def ue_arrival_rate(self):
+        return self._ue_arrival_rate
+
+    @property
+    def ue_service_rate(self):
+        return self._ue_service_rate
+
+    @property
+    def total_time_steps(self):
+        return self._total_time_steps
+
+    @property
+    def priority_ue_proportion(self):
+        return self._priority_ue_proportion
+
+    @property
+    def max_ue_per_mbs(self):
+        return self._max_ue_per_mbs
+
+    @property
+    def max_ue_per_sbs(self):
+        return self._max_ue_per_sbs
+
+    @property
+    def max_bs_per_ue(self):
+        return self._max_bs_per_ue
+
+    @property
+    def ordinary_ues_weight(self):
+        return self._ordinary_ues_weight
+
+    @property
+    def priority_ues_weight(self):
+        return self._priority_ues_weight

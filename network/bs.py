@@ -5,9 +5,10 @@ class BS:
         self.type = type_
         self.point = point
         self.load = 0.0
+        self.max_load = 0.0
         self.power = 0.0
         self.tx_gain = 0.0
-        self.resouce_blocks = 0.0
+        self.resouce_blocks = 100
         self.hetnet = None
 
     def increase_bias(self, bias):

@@ -30,7 +30,8 @@ def find_nondominated_solutions(populacao):
 
 
 class MOGWO:
-    def __init__(self, max_steps, population_size, n_segments):
+    def __init__(self, cluster, max_steps, population_size, n_segments):
+        self.cluster = cluster
         self.max_steps = max_steps
         self.population = []
         self.a = []

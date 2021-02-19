@@ -90,3 +90,4 @@ def get_visual_cluster(pso_gbest, data):
         plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),
                  markeredgecolor='k', markersize=6)
     plt.title('Estimated number of clusters: %d' % n_clusters_)
+    plt.show()

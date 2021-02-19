@@ -11,10 +11,11 @@ class UE:
         self.profile = ApplicationProfile.DATA_BACKUP
         self._evaluation = False
         self.priority = False
+        self.max_associated_bs = 0
 
     @property
     def evaluation(self):
-        if self.datarate >= self.profile.datarate:
+        if self.datarate >= (self.profile.datarate * self.profile.compression_factor):
             self._evaluation = True
         return self._evaluation
 

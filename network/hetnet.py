@@ -17,17 +17,17 @@ class HetNet:
         self.network_element = list()
         self.env = env
         self.evaluation = dict(satisfaction=0.0, total_ue=0.0)
-        # TODO: Incluir parâmtros na Configuração DEFAULT
-        self.ueQueue = SimpleQueue(4, 1, 1000, self.env.simulation_area, self.env.ue_height)
+        self.ueQueue = SimpleQueue(env)
 
     def add_bs(self, bs):
         if bs.type == 'MBS':
             bs.power = self.env.mbs_power
             bs.tx_gain = self.env.mbs_gain
+            bs.max_load = self.env.max_ue_per_mbs
         else:
             bs.power = self.env.sbs_power
             bs.tx_gain = self.env.sbs_gain
-        bs.resouce_blocks = 100
+            bs.max_load = self.env.max_ue_per_sbs
         bs.hetnet = self
         self.list_bs.append(bs)
 
@@ -39,13 +39,8 @@ class HetNet:
             self.network_element.append(linha_network_element)
 
     def run(self, timestep):
-        #Add UEs
-        # for ue in self.ueQueue.ues[timestep]:
-        #     self.ue_list.append(ue)
-
-        for idx in range(timestep):
-            for ue in self.ueQueue.ues[idx]:
-                self.ue_list.append(ue)
+        # Add UEs
+        self.ue_list = self.ueQueue.populate_ues(timestep)
 
         if len(self.ue_list) > 0 and len(self.list_bs) > 0:
             # Constructs the NetworkElement structure
@@ -71,27 +66,35 @@ class HetNet:
         self.evaluation = dict(satisfaction=0.0, total_ue=0.0)
 
     def __get_sinr(self):
-        bw = self.env.bandwidth * (10**6)
+        bw = self.env.bandwidth * (10 ** 6)
         sigma = (10.0 ** (-3.0)) * (10.0 ** (self.env.noise_power / 10.0))
         total_thermal_noise = bw * sigma
 
         for linha in self.network_element:
             for element in linha:
                 element.sinr = element.bs.power - get_pathloss(element.bs.type, element.distance) + element.bs.tx_gain
-                element.sinr = (10 ** (-3.0)) * (10 ** (element.sinr/10.0))
+                element.sinr = (10 ** (-3.0)) * (10 ** (element.sinr / 10.0))
                 other_elements = [x for x in linha if x != element]
                 interference = 0.0
                 for o_element in other_elements:
-                    o_element_i = o_element.bs.power - get_pathloss(o_element.bs.type, o_element.distance) + o_element.bs.tx_gain
-                    interference += ((10 ** (-3.0)) * (10 ** (o_element_i/10.0)))
-                element.sinr = element.sinr/(interference + total_thermal_noise)
+                    o_element_i = o_element.bs.power - get_pathloss(o_element.bs.type,
+                                                                    o_element.distance) + o_element.bs.tx_gain
+                    interference += ((10 ** (-3.0)) * (10 ** (o_element_i / 10.0)))
+                element.sinr = element.sinr / (interference + total_thermal_noise)
                 element.sinr = 10.0 * np.log10(element.sinr)
                 element.biased_sinr = element.sinr
 
     def __get_association(self):
         for linha in self.network_element:
-            ne = max(linha, key=attrgetter('biased_sinr'))
-            ne.coverage_status = True
+            ne = sorted(linha, key=attrgetter('biased_sinr'), reverse=True)
+            for ne_element in ne:
+                associated_bs = 0
+                if ne_element.bs.load < ne_element.bs.max_load:
+                    ne_element.coverage_status = True
+                    ne_element.bs.load += 1
+                    associated_bs += 1
+                    if associated_bs >= ne_element.ue.max_associated_bs:
+                        break
 
     def __get_resource_allocation(self):
         for coluna in map(list, zip(*self.network_element)):
@@ -107,17 +110,31 @@ class HetNet:
         bitrate = self.env.number_subcarriers * self.env.number_ofdm_symbols
         for linha in self.network_element:
             ne = [element for element in linha if element.coverage_status is True]
-            sinr = ne[0].sinr
-            efficiency = get_efficiency(sinr)
-            rbs = ne[0].ue.resource_blocks
-            bitrate_ue = (rbs * efficiency * bitrate)/self.env.subframe_duration
-            bitrate_ue = (bitrate_ue * 1000.0)/1000000.0
-            ne[0].ue.datarate = bitrate_ue
+            if len(ne) > 0:
+                # TODO: Implementar associação de UE para várias BSs
+                sinr = ne[0].sinr
+                efficiency = get_efficiency(sinr)
+                rbs = ne[0].ue.resource_blocks
+                bitrate_ue = (rbs * efficiency * bitrate) / self.env.subframe_duration
+                bitrate_ue = (bitrate_ue * 1000.0) / 1000000.0
+                ne[0].ue.datarate = bitrate_ue
+            else:
+                linha[0].ue.datarate = 0
 
     def __get_metrics(self):
-        sf = np.array([ue.datarate for ue in self.ue_list if ue.evaluation is True])
-        self.evaluation['satisfaction'] = (sf.size / len(self.ue_list)) * 100
+        fulfilled_qos_ues = np.array([ue for ue in self.ue_list if ue.evaluation is True])
+        weighted_sum = 0
+        for ue in fulfilled_qos_ues:
+            if ue.priority:
+                weighted_sum += self.env.priority_ues_weight
+            else:
+                weighted_sum += self.env.ordinary_ues_weight
+        total_weights = self.ueQueue.total_priority_ues * self.env.priority_ues_weight + \
+                        self.ueQueue.total_ordinary_ues * self.env.ordinary_ues_weight
+        self.evaluation['satisfaction'] = (weighted_sum / total_weights) * 100
         self.evaluation['total_ue'] = len(self.ue_list)
+        self.evaluation['total_priority_ues'] = self.ueQueue.total_priority_ues
+        self.evaluation['total_ordinary_ues'] = self.ueQueue.total_ordinary_ues
 
     def debug(self):
         for linha in self.network_element:

@@ -12,8 +12,6 @@ from qlearning.agent import SingleAgent
 # Instantiate a Hetnet using Default Configs
 h = HetNet(Network.DEFAULT)
 
-
-
 # Deploy 10 UEs
 for i in range(20):
     x = np.random.randint(30, 80)

@@ -1,3 +1,4 @@
+import random
 import numpy as np
 
 from mobility.point import Point
@@ -5,42 +6,49 @@ from network.ue import UE
 
 
 class SimpleQueue:
-    def __init__(self, arrival_rate, service_rate, total_time, simulation_rea, ue_height):
-        self.arrival_rate = arrival_rate
-        self.service_rate = service_rate
-        self.total_time = total_time
-        self.total_ues = []
-        self.ues = []
-        self.dimension = np.math.sqrt(simulation_rea)
-        self.ue_height = ue_height
+    def __init__(self, env):
+        self.arrival_rate = env.ue_arrival_rate
+        self.service_rate = env.priority_ue_proportion
+        self.total_time = env.total_time_steps
+        self.dimension = np.math.sqrt(env.simulation_area)
+        self.ue_height = env.ue_height
+        self.priority_ue_proportion = env.priority_ue_proportion
+        self.ue_height = env.ue_height
+        self.total_priority_ues = 0
+        self.total_ordinary_ues = 0
 
-        for i in range(self.total_time):
-            self.total_ues.append(i * self.arrival_rate)
-
-        for i in range(2, self.total_time):
-            self.total_ues[i] = self.total_ues[i] - (i - 1) * self.service_rate
-
-        self.__populate_ues()
-
-    def __populate_ues(self):
-        for idx, total in enumerate(self.total_ues):
-            ue_list = []
-            if idx > 0:
-                new_ues = total - self.total_ues[idx - 1]
+    def populate_ues(self, timestep):
+        ues = []
+        razao = self.arrival_rate - self.service_rate
+        total_ues = 10 + int(razao * (timestep - 1))
+        self.total_priority_ues = int(total_ues * self.priority_ue_proportion)
+        self.total_ordinary_ues = total_ues - self.total_priority_ues
+        current_total_priority_ues = 0
+        current_total_ordinary_ues = 0
+        for idx in range(total_ues):
+            x = np.random.uniform(self.dimension * (-1), self.dimension)
+            y = np.random.uniform(self.dimension * (-1), self.dimension)
+            p = Point(x, y, self.ue_height)
+            ue = UE(idx, p)
+            flag = False
+            if not flag:
+                value = random.randint(0, 1)
             else:
-                new_ues = total
-            total_priority = 1
-            counter_priority = total_priority
-            for i in range(new_ues):
-                x = np.random.randint(self.dimension * (-1), self.dimension)
-                y = np.random.randint(self.dimension * (-1), self.dimension)
-                p_i = Point(x, y, self.ue_height)
-                ue = UE(i, p_i)
-                if total_priority > 0 and counter_priority > 0:
+                value = 0
+            if value is 1:
+                if current_total_priority_ues < self.total_priority_ues:
                     ue.priority = True
-                    counter_priority = counter_priority - 1
-                ue_list.append(ue)
-            self.ues.append(ue_list)
+                    current_total_priority_ues += 1
+                else:
+                    current_total_ordinary_ues += 1
+            else:
+                if flag or current_total_ordinary_ues < self.total_ordinary_ues:
+                    current_total_ordinary_ues += 1
+                else:
+                    ue.priority = True
+                    current_total_priority_ues += 1
+            ues.append(ue)
+        return ues
 
     def __str__(self):
-        return '[arrival_rate={}, service_rate={}]'.format(self.arrival_rate, self.service_rate)
+        return '[priority_ues, ordinary_ues={}]'.format(self.total_priority_ues, self.total_ordinary_ues)
