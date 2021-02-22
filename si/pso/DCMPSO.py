@@ -72,9 +72,7 @@ class DCMPSO(PSO):
                 self.population = selected_population
 
                 if size_excluded == 0:
-                    size_excluded = int(0.1 * len(self.population))
-                else:
-                    size_excluded *= 2
+                    size_excluded = int(0.2 * len(self.population))
 
                 print("==========> Reseting {} particles".format(size_excluded))
                 for i in range(size_excluded):
