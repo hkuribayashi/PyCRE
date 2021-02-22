@@ -32,6 +32,7 @@ class HetNet:
         self.list_bs.append(bs)
 
     def __get_ne(self):
+        self.network_element = list()
         for ue in self.ue_list:
             linha_network_element = list()
             for bs in self.list_bs:
@@ -137,7 +138,4 @@ class HetNet:
         self.evaluation['total_ordinary_ues'] = self.ueQueue.total_ordinary_ues
 
     def debug(self):
-        for linha in self.network_element:
-            biased_sinr = [o.biased_sinr for o in linha]
-            print(biased_sinr)
         get_visual(self)

@@ -17,4 +17,3 @@ class NetworkElement:
                                                                                                                 self.biased_sinr,
                                                                                                                 self.distance,
                                                                                                                 self.coverage_status)
-

@@ -16,6 +16,7 @@ class SimpleQueue:
         self.ue_height = env.ue_height
         self.total_priority_ues = 0
         self.total_ordinary_ues = 0
+        self.max_associated_bs = env.max_bs_per_ue
 
     def populate_ues(self, timestep):
         ues = []
@@ -30,6 +31,7 @@ class SimpleQueue:
             y = np.random.uniform(self.dimension * (-1), self.dimension)
             p = Point(x, y, self.ue_height)
             ue = UE(idx, p)
+            ue.max_associated_bs = self.max_associated_bs
             flag = False
             if not flag:
                 value = random.randint(0, 1)

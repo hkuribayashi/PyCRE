@@ -3,24 +3,43 @@ import numpy as np
 
 class Cluster:
 
-    def __init__(self, id_, env):
+    def __init__(self, id_, priority_ues_weight, ordinary_ues_weight, outage_threshold):
         self.id = id_
         self.ue_list = []
         self.evaluation = {}
-        self.env = env
         self.target_cluster = False
+        self.priority_ues_weight = priority_ues_weight
+        self.ordinary_ues_weight = ordinary_ues_weight
+        self.outage_threshold = outage_threshold
+        self.network_slice = None
 
     def evaluate(self):
         fulfilled_qos_ues = np.array([ue for ue in self.ue_list if ue.evaluation is True])
         weighted_sum = 0
         for ue in fulfilled_qos_ues:
             if ue.priority:
-                weighted_sum += self.env.priority_ues_weight
+                weighted_sum += self.priority_ues_weight
             else:
-                weighted_sum += self.env.ordinary_ues_weight
-        total_weights = self.ueQueue.total_priority_ues * self.env.priority_ues_weight + \
-                        self.ueQueue.total_ordinary_ues * self.env.ordinary_ues_weight
-        self.evaluation['satisfaction'] = (weighted_sum / total_weights) * 100
-        self.evaluation['total_ue'] = len(self.ue_list)
-        self.evaluation['total_priority_ues'] = self.ueQueue.total_priority_ues
-        self.evaluation['total_ordinary_ues'] = self.ueQueue.total_ordinary_ues
+                weighted_sum += self.ordinary_ues_weight
+        total_ues = len(self.ue_list)
+        total_priority_ues = len([ue.priority for ue in self.ue_list if ue.priority is True])
+        total_weights = total_priority_ues * self.priority_ues_weight + (
+                    total_ues - total_priority_ues) * self.ordinary_ues_weight
+
+        evaluation = weighted_sum / total_weights
+        if evaluation < self.outage_threshold:
+            self.target_cluster = True
+
+        self.evaluation['satisfaction'] = evaluation * 100
+        self.evaluation['total_ue'] = total_ues
+        self.evaluation['total_priority_ues'] = total_priority_ues
+        self.evaluation['total_ordinary_ues'] = total_ues - total_priority_ues
+
+    def __str__(self):
+        return "[id={}, evaluation={}, target_cluster={}, total_ues={}, " \
+               "total_priority_ues={}, total_ordinary_ues={}]".format(self.id,
+                                                                      self.evaluation['satisfaction'],
+                                                                      self.target_cluster,
+                                                                      self.evaluation['total_ue'],
+                                                                      self.evaluation["total_priority_ues"],
+                                                                      self.evaluation["total_ordinary_ues"])

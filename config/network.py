@@ -4,12 +4,13 @@ from enum import Enum
 class Network(Enum):
 
     DEFAULT = (1000000.0, 20.0, 46.0, 32.0, -174.0, 35.0, 0.0, 5.0, 5.0, 1.0, 12.0, 14.0, 1.0, 80.0, -30.0, 600, 4, 1,
-               1000, 0.2, 50, 20, 1, 1, 1.5)
+               1000, 0.2, 50, 20, 1, 1, 1.5, 0.7)
 
     def __init__(self, simulation_area, bandwidth, mbs_power, sbs_power, noise_power, mbs_height, sbs_height, mbs_gain,
                  sbs_gain, ue_height, number_subcarriers, number_ofdm_symbols, subframe_duration, max_bias, min_bias,
                  image_resolution, ue_arrival_rate, ue_service_rate, total_time_steps, priority_ue_proportion,
-                 max_ue_per_mbs, max_ue_per_sbs, max_bs_per_ue, ordinary_ues_weight, priority_ues_weight):
+                 max_ue_per_mbs, max_ue_per_sbs, max_bs_per_ue, ordinary_ues_weight, priority_ues_weight,
+                 outage_threshold):
 
         if simulation_area < 0 or simulation_area is None:
             raise RuntimeError('Incorrect value for parameter simulation_area: {}'.format(simulation_area))
@@ -138,6 +139,11 @@ class Network(Enum):
         else:
             self._priority_ues_weight = priority_ues_weight
 
+        if outage_threshold < 0 or outage_threshold > 1:
+            raise RuntimeError('Incorrect value for parameter outage_threshold: {}'.format(outage_threshold))
+        else:
+            self._outage_threshold = outage_threshold
+
     @property
     def simulation_area(self):
         return self._simulation_area
@@ -237,3 +243,7 @@ class Network(Enum):
     @property
     def priority_ues_weight(self):
         return self._priority_ues_weight
+
+    @property
+    def outage_threshold(self):
+        return self._outage_threshold

@@ -21,8 +21,12 @@ iterations = int(sys.argv[2])
 # Get population size
 population_size = int(sys.argv[3])
 
+# Output Directory
+path = sys.argv[4]
+
 # Debug
-print("Running DCM with DCMPSO: {} simulations, {} iterations and {} particles".format(simulations, iterations,
+print("Running DCM with DCMPSO: {} simulations, {} iterations and {} particles".format(simulations,
+                                                                                       iterations,
                                                                                        population_size))
 
 for key in traffic_level:
@@ -53,7 +57,7 @@ for key in traffic_level:
         h.run(traffic_level[key])
 
         # Instantiate DC Module with DBSCAM algorithm
-        dcm = DCM(ClusteringMethod.DBSCAN, PSOAlgorithm.DCMPSO, h.ue_list)
+        dcm = DCM(ClusteringMethod.DBSCAN, PSOAlgorithm.DCMPSO, h, traffic_level[key])
 
         # Run DCM
         dcm.optimization_engine(population_size, iterations)
@@ -64,7 +68,5 @@ for key in traffic_level:
 
     print("\n")
 
-    save_to_csv(mean_evolution, Network.DEFAULT.dir_output_csv,
-                "mean_evolution_{}_pop_{}_DCMPSO.csv".format(key, population_size))
-    save_to_csv(gbest_evolution, Network.DEFAULT.dir_output_csv,
-                "mean_evolution_{}_pop_{}_gbest_DCMPSO.csv".format(key, population_size))
+    save_to_csv(mean_evolution, path, "mean_evolution_{}_pop_{}_DCMPSO.csv".format(key, population_size))
+    save_to_csv(gbest_evolution, path, "mean_evolution_{}_pop_{}_gbest_DCMPSO.csv".format(key, population_size))
