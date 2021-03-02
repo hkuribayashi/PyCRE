@@ -126,16 +126,8 @@ class DCM:
             self.optimization_output = {'SIWPSO-{}'.format(population_size): pso.mean_evaluation_evolution,
                                         'SIWPSO-{}-gbest'.format(population_size): pso.gbest_evaluation_evolution}
 
-    def get_cluster_analysis(self, population_size, max_steps=30, repetitions=2):
-        consolidate_result = []
-        counter = 0
-        while counter < repetitions:
-            pso = DCMPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
-            pso.search()
-            n_clusters, mean_cluster_size, n_outliers = get_statistics(pso.g_best.best_epsilon, pso.g_best.best_min_samples, self.data)
-            entry = [n_clusters, mean_cluster_size, n_outliers]
-            consolidate_result.append(entry)
-            counter += 1
-        return consolidate_result
-
-
+    def get_cluster_analysis(self, population_size, max_steps=30):
+        pso = DCMPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
+        pso.search()
+        n_clusters, mean_cluster_size, n_outliers = get_statistics(pso.g_best.best_epsilon, pso.g_best.best_min_samples, self.data)
+        return [n_clusters, mean_cluster_size, n_outliers]

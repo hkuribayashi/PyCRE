@@ -35,9 +35,7 @@ print("Running DCM with DCMPSO: {} simulations, {} iterations and {} particles".
 # Debug
 print("Traffic Level: {}%".format(traffic_key))
 
-# Initialize the result variables
-mean_evolution = []
-gbest_evolution = []
+total_results = []
 
 # TODO: Incluir o número de repetições na configuração DEFAULT
 for idx in range(simulations):
@@ -62,6 +60,7 @@ for idx in range(simulations):
 
     # Run DCM
     results = dcm.get_cluster_analysis(population_size, iterations)
+    total_results.append(results)
 
-    # Save Results
-    save_to_csv(results, path, "dcm_cluster_statistics_{}.csv".format(traffic_key))
+# Save Results
+save_to_csv(total_results, path, "dcm_cluster_statistics_{}.csv".format(traffic_key))
