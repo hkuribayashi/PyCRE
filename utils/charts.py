@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-from sklearn.cluster import DBSCAN
-
+import pandas as pd
+from pandas import DataFrame
 
 from config.network import Network
 
@@ -65,8 +65,7 @@ def get_evaluation_evolution(data, filename, marker='', xlim=None):
     plt.close()
 
 
-def get_visual_cluster(pso_gbest, data):
-    clustering = DBSCAN(eps=pso_gbest.best_epsilon, min_samples=pso_gbest.best_min_samples).fit(data)
+def get_visual_cluster(clustering, data):
     labels = clustering.labels_
     core_samples_mask = np.zeros_like(clustering.labels_, dtype=bool)
     core_samples_mask[clustering.core_sample_indices_] = True
@@ -90,4 +89,23 @@ def get_visual_cluster(pso_gbest, data):
         plt.plot(xy[:, 0], xy[:, 1], 'o', markerfacecolor=tuple(col),
                  markeredgecolor='k', markersize=6)
     plt.title('Estimated number of clusters: %d' % n_clusters_)
+    plt.show()
+
+
+def get_visual_pareto(data):
+    all_points = []
+    for d_ in data:
+        if d_.evaluation_f1 != 0 and d_.evaluation_f2 != 0:
+            point = [(-1) * d_.evaluation_f1, d_.evaluation_f2]
+            all_points.append(point)
+
+    df = DataFrame(all_points, columns=['x', 'y'])
+
+    # Make the plot with this subset
+    plt.plot('x', 'y', data=df, linestyle='', marker='o')
+
+    # titles
+    plt.xlabel('Value of X')
+    plt.ylabel('Value of Y')
+    plt.title('Overplotting? Sample your data', loc='left')
     plt.show()

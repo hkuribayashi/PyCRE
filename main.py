@@ -35,14 +35,14 @@ h.add_bs(bs4)
 side = np.sqrt(Network.DEFAULT.simulation_area)
 
 # Generating SBSs
-for id in range(5, 45):
+for id_ in range(5, 45):
     x = random.uniform(-side, side)
     y = random.uniform(-side, side)
     p_x = Point(x, y, Network.DEFAULT.sbs_height)
-    bs_x = BS(id, "SBS", p_x)
+    bs_x = BS(id_, "SBS", p_x)
     h.add_bs(bs_x)
 
-for step in range(1, Network.DEFAULT.total_time_steps):
+for step in range(13, Network.DEFAULT.total_time_steps):
 
     h.run(step)
     print("Step: {} - Global Satisfaction: {} | UEs: {}".format(step, h.evaluation['satisfaction'], len(h.ue_list)))
@@ -50,7 +50,7 @@ for step in range(1, Network.DEFAULT.total_time_steps):
     if h.evaluation['satisfaction'] <= (Network.DEFAULT.outage_threshold * 100):
 
         # Plot the hetnet visual representation
-        # h.debug()
+        h.debug()
 
         print("\n")
         print("Instantiate the Dynamic Clustering Module with DBSCAM algorithm")
@@ -62,7 +62,7 @@ for step in range(1, Network.DEFAULT.total_time_steps):
         for target_cluster in dcm.clusters:
             print(target_cluster)
             # Instantiate IO Module with MOGWO Algorithm
-            # iom = IOM(target_cluster, GWOAlgorithm.MOGWO)
+            iom = IOM(target_cluster, GWOAlgorithm.GWO)
 
             # Compute the network slice
             # network_slice = iom.compute_network_slice()

@@ -1,48 +1,65 @@
 import random
+
 import numpy as np
 from functools import total_ordering
 
 
-# Min lateral surface area
-def objective_f1(base_radius, slant_height):
-    return np.pi * base_radius * np.sqrt(base_radius ** 2 + slant_height ** 2)
-
-
-# Min total area
-def objective_f2(base_radius, slant_height):
-    return np.pi * base_radius * (base_radius + np.sqrt(base_radius ** 2 + slant_height ** 2))
-
-
-# Constraint Verification
-def constraint_verification(base_radius, slant_height):
-    if base_radius < 0 or base_radius > 10:
-        return False
-    elif slant_height < 0 or slant_height > 20:
-        return False
-    else:
-        return True
-
-
 class MOGWOWolf:
-    def __init__(self, idx):
+    def __init__(self, idx, solution_size):
         self.idx = idx
-        self.base_radius = random.uniform(0.001, 10.0)
-        self.slant_height = random.uniform(0.001, 20.0)
-        self.evaluation_f1 = float('inf')
-        self.evaluation_f2 = float('inf')
-        self.volume = 0.0
+        flag = True
+        while flag:
+            self.solution = []
+            for _ in range(solution_size):
+                self.solution.append(random.uniform(0, 1))
+            count = len([componente for componente in self.solution if componente >= 0.5])
+            if count >= 1:
+                flag = False
+
+        self.evaluation_f1 = np.Inf
+        self.evaluation_f2 = np.Inf
+        self.solution_size = solution_size
 
     def __hash__(self):
         return self.idx
 
-    def evaluate(self):
-        self.volume = (np.pi / 3.0) * (self.base_radius ** 2) * self.slant_height
-        if constraint_verification(self.base_radius, self.slant_height):
-            self.evaluation_f1 = objective_f1(self.base_radius, self.slant_height)
-            self.evaluation_f2 = objective_f2(self.base_radius, self.slant_height)
-        else:
-            self.evaluation_f1 = float('inf')
-            self.evaluation_f2 = float('inf')
+    def evaluate(self, bs_list):
+        n_rb = 0
+        for id_, bs in enumerate(bs_list):
+            if self.solution[id_] > 0.5:
+                n_rb += bs.resouce_blocks if bs.load == 0 else bs.resouce_blocks/bs.load
+        self.evaluation_f1 = (-1) * n_rb
+        self.evaluation_f2 = len([componente for componente in self.solution if componente >= 0.5])
+
+    def update_position(self, alpha, beta, delta, a):
+        for idx, componente in enumerate(self.solution):
+            # Alpha
+            r1 = random.random()
+            r2 = random.random()
+            A = 2.0 * a * r1 - a
+            C = 2.0 * r2
+            D_alpha = abs(C * alpha.solution[idx] - componente)
+            x1 = alpha.solution[idx] - A * D_alpha
+
+            # Beta
+            r1 = random.random()
+            r2 = random.random()
+            A = 2.0 * a * r1 - a
+            C = 2.0 * r2
+            D_beta = abs(C * beta.solution[idx] - componente)
+            x2 = beta.solution[idx] - A * D_beta
+
+            # Delta
+            r1 = random.random()
+            r2 = random.random()
+            A = 2.0 * a * r1 - a
+            C = 2.0 * r2
+            D_delta = abs(C * delta.solution[idx] - componente)
+            x3 = delta.solution[idx] - A * D_delta
+
+            # Compute the mean position
+            new_position = (x1 + x2 + x3) / 3.0
+            self.solution[idx] = new_position
 
     def __eq__(self, other):
         if isinstance(other, MOGWOWolf):
@@ -50,8 +67,7 @@ class MOGWOWolf:
         return False
 
     def __str__(self):
-        return "[MOGWOWolf id={}, base_radius={}, slant_height={}, evaluation_f1={}, evaluation_f2={}, volume={}]".format(
-            self.idx, self.base_radius, self.slant_height, self.evaluation_f1, self.evaluation_f2, self.volume)
+        return "[MOGWOWolf id={}, evaluation_f1={}, evaluation_f2={}, solution={}]".format(self.idx, self.evaluation_f1, self.evaluation_f2, self.solution)
 
     @total_ordering
     def __lt__(self, other):

@@ -6,6 +6,7 @@ class Cluster:
     def __init__(self, id_, priority_ues_weight, ordinary_ues_weight, outage_threshold):
         self.id = id_
         self.ue_list = []
+        self.bs_list = None
         self.evaluation = {}
         self.target_cluster = False
         self.priority_ues_weight = priority_ues_weight

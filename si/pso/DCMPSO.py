@@ -72,9 +72,12 @@ class DCMPSO(PSO):
                 self.population = selected_population
 
                 if size_excluded == 0:
-                    size_excluded = int(0.2 * len(self.population))
+                    size_excluded = int(0.1 * len(self.population))
+                if size_excluded == 0 or size_excluded == 200:
+                    size_excluded = 1
 
                 print("==========> Reseting {} particles".format(size_excluded))
+
                 for i in range(size_excluded):
                     p = DCMPSOParticle(self.clustering_method, len(self.data), self.cognitive_factor)
                     epsilon_r = random.uniform(0.1, 2.0)

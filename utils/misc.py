@@ -2,9 +2,8 @@ import pandas as pd
 import numpy as np
 import scipy.stats
 import csv
-import matplotlib.pyplot as plt
 
-from mobility.point import Point
+from sklearn.cluster import DBSCAN
 
 
 def get_pathloss(type_, distance):
@@ -77,7 +76,7 @@ def get_hppp(x, y, z, lambda_):
     # plt.show()
 
     for (i, j) in zip(xx, yy):
-        #result.append(Point(i[0], j[0], z))
+        # result.append(Point(i[0], j[0], z))
         result.append([i[0], j[0]])
 
     return result
@@ -91,4 +90,26 @@ def save_to_csv(data, path, filename):
 
 def consolidate_results(path, filename):
     data = pd.read_csv('{}{}'.format(path, filename), header=None, delimiter=',', sep=',')
-    return data.mean(axis = 0)
+    return data.mean(axis=0)
+
+
+def get_k_closest_bs(ue, bs_list):
+    min_distance = 100000000.0
+    idx_min = -1
+    for idx, bs in enumerate(bs_list):
+        distance = get_distance(ue.point, bs.point)
+        if distance < min_distance and bs.type == 'SBS':
+            min_distance = distance
+            idx_min = idx
+    closest_bs = [bs_list[idx_min]]
+    return closest_bs
+
+
+def get_statistics(epsilon, min_samples, data):
+    db_cluster = DBSCAN(eps=epsilon, min_samples=min_samples).fit(data)
+    labels = db_cluster.labels_
+    n_noise_ = list(labels).count(-1)
+    n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+    mean_cluster_size = len(data)/n_clusters_
+
+    return n_clusters_, mean_cluster_size, n_noise_

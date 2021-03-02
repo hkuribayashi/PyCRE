@@ -11,7 +11,7 @@ class MOGWOSegmentController:
         self.probability = {}
         self.n_segments = n_segments
         for idx in range(n_segments):
-            self.segments[idx] = MOGWOSegment(100)
+            self.segments[idx] = MOGWOSegment(15)
             self.probability[idx] = 0.0
             self.segments[idx].archive = non_dominated_solutions[idx]
 
@@ -34,5 +34,17 @@ class MOGWOSegmentController:
         for p in non_dominated_list:
             flag = True
             while flag:
-                key = random.randint(0, self.n_segments-1)
+                key = random.randint(0, self.n_segments - 1)
                 flag = self.segments[key].add_solution(p)
+
+    def get_archive_size(self):
+        archive_size = 0
+        for key in self.segments:
+            archive_size += len(self.segments[key].archive)
+        return archive_size
+
+    def get_archived_solutions(self):
+        archived_solutions = []
+        for key in self.segments:
+            archived_solutions.append(self.segments[key].archive)
+        return archived_solutions

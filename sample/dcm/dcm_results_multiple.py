@@ -4,7 +4,7 @@ from utils.misc import consolidate_results
 
 
 traffic_level = {'10': 100, '60': 600, '100': 999}
-algorithms = ['DCMPSO', 'CoPSO', 'IIWPSO', 'SIWPSO']
+algorithms = ['DCMPSO', 'CoPSO', 'IIWPSO', 'SIWPSO', 'DCMPSO-2']
 population_size = [50, 100, 200]
 chart_data = {}
 
