@@ -3,7 +3,7 @@ from abc import ABC
 import numpy as np
 
 from sklearn.cluster import DBSCAN, OPTICS
-from sklearn.metrics import davies_bouldin_score
+from sklearn.metrics import davies_bouldin_score, silhouette_score
 
 from config.network import Network
 
@@ -34,10 +34,10 @@ class PSOParticle(ABC):
             # Get the fitness evaluation
 
             current_evaluation = davies_bouldin_score(data, labels)
-            current_evaluation += (-1) * n_clusters_
-            n_noise_ = list(labels).count(-1)
-            current_evaluation += n_noise_
-            current_evaluation += (-1) * ((len(data) - n_noise_) / n_clusters_)
+            # current_evaluation += (-1) * n_clusters_
+            # n_noise_ = list(labels).count(-1)
+            # current_evaluation += n_noise_
+            current_evaluation += (-1) * silhouette_score(data, labels)
 
             # Updates the evaluation variables
             if current_evaluation < self.evaluation:
