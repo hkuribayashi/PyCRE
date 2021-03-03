@@ -10,7 +10,7 @@ from network.hetnet import HetNet
 from utils.misc import save_to_csv
 
 
-traffic_level = {'10': 100, '15': 150, '60': 600, '100': 999}
+traffic_level = {'10': 100, '15': 150, '20': 200, '25': 250, '30': 300, '35': 350, '40': 400, '45': 450, '60': 600, '100': 999}
 
 # Get traffic level
 traffic_key = sys.argv[1]
