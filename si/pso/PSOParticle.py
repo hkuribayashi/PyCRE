@@ -32,7 +32,12 @@ class PSOParticle(ABC):
         # Check if there is more than 1 cluster
         if n_clusters_ > 1:
             # Get the fitness evaluation
+
             current_evaluation = davies_bouldin_score(data, labels)
+            current_evaluation += (-1) * n_clusters_
+            n_noise_ = list(labels).count(-1)
+            current_evaluation += n_noise_
+            current_evaluation += (-1) * ((len(data) - n_noise_) / n_clusters_)
 
             # Updates the evaluation variables
             if current_evaluation < self.evaluation:

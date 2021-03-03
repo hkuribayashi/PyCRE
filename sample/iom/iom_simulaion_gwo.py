@@ -23,13 +23,13 @@ for target_cluster in dcm.clusters:
     iom = IOM(target_cluster, path="/Users/hugo/Desktop/PyCRE/iom/csv/")
 
     # Compute the network slice
-    iom.compute_network_slice(GWOAlgorithm.MOGWO)
+    # iom.compute_network_slice(GWOAlgorithm.MOGWO)
 
     # Instantiate IO Module with GWO Algorithm
     # iom = IOM(target_cluster, GWOAlgorithm.GWO)
 
     # Compute the network slice
-    # iom.compute_network_slice(path="/Users/hugo/Desktop/PyCRE/iom/csv/")
+    iom.compute_network_slice(GWOAlgorithm.MOGWO)
 
     # Start the RLM for each network slice
-    # print(target_cluster.networkslice)
+    print(target_cluster.networkslice)

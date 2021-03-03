@@ -110,6 +110,9 @@ def get_statistics(epsilon, min_samples, data):
     labels = db_cluster.labels_
     n_noise_ = list(labels).count(-1)
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
-    mean_cluster_size = (len(data) - n_noise_)/n_clusters_
+    if n_clusters_ >= 1:
+        mean_cluster_size = (len(data) - n_noise_)/n_clusters_
+    else:
+        mean_cluster_size = 0
 
     return n_clusters_, mean_cluster_size, n_noise_

@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-import pandas as pd
 from pandas import DataFrame
+import seaborn as sns
+import pandas as pd
 
 from config.network import Network
 
@@ -109,3 +110,23 @@ def get_visual_pareto(data):
     plt.ylabel('Value of Y')
     plt.title('Overplotting? Sample your data', loc='left')
     plt.show()
+
+
+def get_boxplot(data, path, filename):
+    # Generate the matplotlib figure and axes
+    fig, ax = plt.subplots()
+
+    # Dataset:
+    a = pd.DataFrame({'group': np.repeat('A', 500), 'value': np.random.normal(10, 5, 500)})
+    b = pd.DataFrame({'group': np.repeat('B', 500), 'value': np.random.normal(13, 1.2, 500)})
+    c = pd.DataFrame({'group': np.repeat('B', 500), 'value': np.random.normal(18, 1.2, 500)})
+    d = pd.DataFrame({'group': np.repeat('C', 20), 'value': np.random.normal(25, 4, 20)})
+    e = pd.DataFrame({'group': np.repeat('D', 100), 'value': np.random.uniform(12, size=100)})
+    df = a.append(b).append(c).append(d).append(e)
+
+    # Usual boxplot
+    sns.boxplot(x='group', y='value', data=df, ax=ax)
+
+    # Save Fig
+    plt.savefig('{}{}'.format(path, filename), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+    plt.close()

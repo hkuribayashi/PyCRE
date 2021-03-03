@@ -42,7 +42,7 @@ class IOM:
 
         return global_evolution, alpha_evolution
 
-    def compute_network_slice(self, optimization_strategy, pop_size=200, max_steps=300, segments=10, simulations=100):
+    def compute_network_slice(self, optimization_strategy, pop_size=200, max_steps=300, segments=10, simulations=1):
         if optimization_strategy is GWOAlgorithm.GWO:
             for weight in reversed(range(1, 10)):
                 weight = weight/10
