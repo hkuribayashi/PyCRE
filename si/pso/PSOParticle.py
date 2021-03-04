@@ -33,11 +33,14 @@ class PSOParticle(ABC):
         if n_clusters_ > 1:
             # Get the fitness evaluation
 
+            #current_evaluation = davies_bouldin_score(data, labels)
+            #current_evaluation += (-1) * n_clusters_ * 0.25
+            #n_noise_ = list(labels).count(-1)
+            #current_evaluation += (-1) * ((len(data) - n_noise_)/n_clusters_) * 0.2
+            #current_evaluation += (n_noise_/len(data)) * 0.2
+            #current_evaluation += (-1) * silhouette_score(data, labels)
+
             current_evaluation = davies_bouldin_score(data, labels)
-            current_evaluation += (-1) * n_clusters_ * 0.25
-            n_noise_ = list(labels).count(-1)
-            current_evaluation += (-1) * ((len(data) - n_noise_)/n_clusters_) * 0.2
-            current_evaluation += (n_noise_/len(data)) * 0.2
             current_evaluation += (-1) * silhouette_score(data, labels)
 
             # Updates the evaluation variables

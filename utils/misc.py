@@ -1,7 +1,6 @@
+import csv
 import pandas as pd
 import numpy as np
-import csv
-
 from sklearn.cluster import DBSCAN
 
 
@@ -57,6 +56,11 @@ def save_to_csv(data, path, filename):
     with open('{}{}'.format(path, filename), 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(data)
+
+
+def load_from_csv(path, filename):
+    data = pd.read_csv('{}{}'.format(path, filename), header=None, delimiter=',', sep=',')
+    return data
 
 
 def consolidate_results(path, filename):

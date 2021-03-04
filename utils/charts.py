@@ -112,20 +112,34 @@ def get_visual_pareto(data):
     plt.show()
 
 
-def get_boxplot(data, path, filename):
-    # Generate the matplotlib figure and axes
-    fig, ax = plt.subplots()
+def get_boxplot(data_local, data_servidor, path, filename):
+    mean_data_local = data_local.mean(axis=0)
+    mean_data_servidor = data_servidor.mean(axis=0)
 
-    # Dataset:
-    a = pd.DataFrame({'group': np.repeat('A', 500), 'value': np.random.normal(10, 5, 500)})
-    b = pd.DataFrame({'group': np.repeat('B', 500), 'value': np.random.normal(13, 1.2, 500)})
-    c = pd.DataFrame({'group': np.repeat('B', 500), 'value': np.random.normal(18, 1.2, 500)})
-    d = pd.DataFrame({'group': np.repeat('C', 20), 'value': np.random.normal(25, 4, 20)})
-    e = pd.DataFrame({'group': np.repeat('D', 100), 'value': np.random.uniform(12, size=100)})
-    df = a.append(b).append(c).append(d).append(e)
+    std_data_local = data_local.std(axis=0)
+    std_data_servidor = data_servidor.std(axis=0)
 
-    # Usual boxplot
-    sns.boxplot(x='group', y='value', data=df, ax=ax)
+
+
+    bar_mean = [mean_data_local['Number of Clusters'], mean_data_servidor['Number of Clusters']]
+
+    se_data_local= std_data_local['Number of Clusters'] / np.sqrt(50)
+    se_data_servidor = std_data_servidor['Number of Clusters'] / np.sqrt(50)
+
+    z = 1.96
+
+    lcb_data_local = mean_data_local['Number of Clusters'] - z * se_data_local
+    ucb_data_local = mean_data_local['Number of Clusters'] + z * se_data_local
+
+    lcb_data_servidor = mean_data_servidor['Number of Clusters'] - z * se_data_servidor
+    ucb_data_servidor = mean_data_servidor['Number of Clusters'] + z * se_data_servidor
+
+    errors = [(lcb_data_local, ucb_data_local), (lcb_data_servidor, ucb_data_servidor)]
+
+    bar_position = [0, 3]
+
+    plt.bar(bar_position, bar_mean, yerr=errors, capsize=7)
+    plt.xticks(bar_position, ('Local', 'Servidor'))
 
     # Save Fig
     plt.savefig('{}{}'.format(path, filename), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
