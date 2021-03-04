@@ -39,9 +39,9 @@ class HetNet:
                 linha_network_element.append(NetworkElement(ue, bs))
             self.network_element.append(linha_network_element)
 
-    def run(self, timestep):
+    def run(self, user_density):
         # Add UEs
-        self.ue_list = self.ueQueue.populate_ues(timestep)
+        self.ue_list = self.ueQueue.populate_ues(user_density)
 
         if len(self.ue_list) > 0 and len(self.list_bs) > 0:
             # Constructs the NetworkElement structure

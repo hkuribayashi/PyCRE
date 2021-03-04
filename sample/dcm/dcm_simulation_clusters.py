@@ -10,10 +10,8 @@ from network.hetnet import HetNet
 from utils.misc import save_to_csv
 
 
-traffic_level = {'10': 100, '15': 150, '20': 200, '25': 250, '30': 300, '35': 350, '40': 400, '45': 450, '60': 600, '100': 999}
-
 # Get traffic level
-traffic_key = sys.argv[1]
+user_density = int(sys.argv[1])
 
 # Get total simulations
 simulations = int(sys.argv[2])
@@ -33,7 +31,7 @@ print("Running DCM with DCMPSO: {} simulations, {} iterations and {} particles".
                                                                                        population_size))
 
 # Debug
-print("Traffic Level: {}%".format(traffic_key))
+print("User Density: {} UEs/km2".format(user_density))
 
 total_results = []
 
@@ -53,14 +51,14 @@ for idx in range(simulations):
     h.add_bs(mbs)
 
     # Run the HetNet
-    h.run(traffic_level[traffic_key])
+    h.run(user_density)
 
     # Instantiate DC Module with DBSCAM algorithm
-    dcm = DCM(ClusteringMethod.DBSCAN, PSOAlgorithm.DCMPSO, h, traffic_level[traffic_key])
+    dcm = DCM(ClusteringMethod.DBSCAN, PSOAlgorithm.DCMPSO, h, user_density)
 
     # Run DCM
     results = dcm.get_cluster_analysis(population_size, iterations)
     total_results.append(results)
 
 # Save Results
-save_to_csv(total_results, path, "dcm_cluster_statistics_{}.csv".format(traffic_key))
+save_to_csv(total_results, path, "dcm_cluster_statistics_{}.csv".format(user_density))

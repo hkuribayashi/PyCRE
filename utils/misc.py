@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import scipy.stats
 import csv
 
 from sklearn.cluster import DBSCAN
@@ -16,7 +15,7 @@ def get_pathloss(type_, distance):
 
 
 def get_distance(point_a, point_b):
-    return ((point_b.x - point_a.x) ** 2 + (point_b.y - point_a.y) ** 2 + (point_b.z - point_a.z) ** 2) ** (0.5)
+    return ((point_b.x - point_a.x) ** 2 + (point_b.y - point_a.y) ** 2 + (point_b.z - point_a.z) ** 2) ** 0.5
 
 
 def get_efficiency(sinr):
@@ -54,34 +53,6 @@ def get_efficiency(sinr):
     return efficiency
 
 
-def get_hppp(x, y, z, lambda_):
-    # Get total area
-    total_area = x * y
-
-    # Initialize the return variable
-    result = []
-
-    # Compute total number of points
-    number_points = scipy.stats.poisson(lambda_ * total_area).rvs()
-
-    # x coordinates of Poisson points
-    xx = x * scipy.stats.uniform.rvs(0, 1, (number_points, 1))
-
-    # y coordinates of Poisson points
-    yy = y * scipy.stats.uniform.rvs(0, 1, (number_points, 1))
-
-    # plt.scatter(xx, yy, edgecolor='b', facecolor='none', alpha=0.5)
-    # plt.xlabel("x")
-    # plt.ylabel("y")
-    # plt.show()
-
-    for (i, j) in zip(xx, yy):
-        # result.append(Point(i[0], j[0], z))
-        result.append([i[0], j[0]])
-
-    return result
-
-
 def save_to_csv(data, path, filename):
     with open('{}{}'.format(path, filename), 'w', newline='') as f:
         writer = csv.writer(f)
@@ -116,3 +87,31 @@ def get_statistics(epsilon, min_samples, data):
         mean_cluster_size = 0
 
     return n_clusters_, mean_cluster_size, n_noise_
+
+
+def get_ippp(simulation_area, lambda0, thinning_probability=0.4):
+    side_length = np.sqrt(simulation_area)
+
+    x_min = -1
+    x_max = 1
+    y_min = -1
+    y_max = 1
+    xDelta = x_max - x_min
+    yDelta = y_max - y_min
+
+    # Simulate a Poisson point process
+    numbPoints = np.random.poisson(lambda0)  # Poisson number of points
+    xx = np.random.uniform(0, xDelta, (numbPoints, 1)) + x_min  # x coordinates of Poisson points
+    yy = np.random.uniform(0, yDelta, (numbPoints, 1)) + y_min  # y coordinates of Poisson points
+
+    # Generate Bernoulli variables (ie coin flips) for thinning
+    # points to be thinned
+    booleThinned = np.random.uniform(0, 1, (numbPoints, 1)) > thinning_probability
+    # points to be retained
+    booleRetained = ~booleThinned
+
+    # x/y locations of retained points
+    xxRetained = xx[booleRetained] * side_length
+    yyRetained = yy[booleRetained] * side_length
+
+    return xxRetained, yyRetained

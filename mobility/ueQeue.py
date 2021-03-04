@@ -3,6 +3,7 @@ import numpy as np
 
 from mobility.point import Point
 from network.ue import UE
+from utils.misc import get_ippp
 
 
 class SimpleQueue:
@@ -10,7 +11,7 @@ class SimpleQueue:
         self.arrival_rate = env.ue_arrival_rate
         self.service_rate = env.priority_ue_proportion
         self.total_time = env.total_time_steps
-        self.dimension = np.math.sqrt(env.simulation_area)
+        self.simulation_area = env.simulation_area
         self.ue_height = env.ue_height
         self.priority_ue_proportion = env.priority_ue_proportion
         self.ue_height = env.ue_height
@@ -18,18 +19,16 @@ class SimpleQueue:
         self.total_ordinary_ues = 0
         self.max_associated_bs = env.max_bs_per_ue
 
-    def populate_ues(self, timestep):
+    def populate_ues(self, user_density):
         ues = []
-        razao = self.arrival_rate - self.service_rate
-        total_ues = 10 + int(razao * (timestep - 1))
+        x_UE, y_UE = get_ippp(self.simulation_area, user_density)
+        total_ues = len(x_UE)
         self.total_priority_ues = int(total_ues * self.priority_ue_proportion)
         self.total_ordinary_ues = total_ues - self.total_priority_ues
         current_total_priority_ues = 0
         current_total_ordinary_ues = 0
         for idx in range(total_ues):
-            x = np.random.uniform(self.dimension * (-1), self.dimension)
-            y = np.random.uniform(self.dimension * (-1), self.dimension)
-            p = Point(x, y, self.ue_height)
+            p = Point(x_UE[idx], y_UE[idx], self.ue_height)
             ue = UE(idx, p)
             ue.max_associated_bs = self.max_associated_bs
             flag = False

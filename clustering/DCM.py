@@ -3,7 +3,6 @@ import itertools
 from collections import Counter
 
 from sklearn.cluster import DBSCAN
-
 from clustering.Cluster import Cluster
 from clustering.PSOAlgorithm import PSOAlgorithm
 from si.pso.CoPSO import CoPSO
@@ -15,7 +14,7 @@ from utils.misc import get_k_closest_bs, get_statistics
 
 
 class DCM:
-    def __init__(self, clustering_method, pso_algorithm, hetnet, timestep, min_samples=None, epsilon=None):
+    def __init__(self, clustering_method, pso_algorithm, hetnet, user_density, min_samples=None, epsilon=None):
         self.method = clustering_method
         self.pso_algorithm = pso_algorithm
         self.data = []
@@ -26,7 +25,7 @@ class DCM:
         self.priority_ues_weight = hetnet.env.priority_ues_weight
         self.ordinary_ues_weight = hetnet.env.ordinary_ues_weight
         self.outage_threshold = hetnet.env.outage_threshold
-        self.timestep = timestep
+        self.user_density = user_density
         self.min_samples = min_samples
         self.epsilon = epsilon
         self.db = None
@@ -62,7 +61,7 @@ class DCM:
         self.db = DBSCAN(min_samples=self.min_samples, eps=self.epsilon).fit(self.data)
 
         # Visual representation
-        # get_visual_cluster(self.db, self.data)
+        get_visual_cluster(self.db, self.data)
 
     def __get_target_clusters(self):
         labels = self.db.labels_
@@ -127,7 +126,15 @@ class DCM:
                                         'SIWPSO-{}-gbest'.format(population_size): pso.gbest_evaluation_evolution}
 
     def get_cluster_analysis(self, population_size, max_steps=30):
-        pso = DCMPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
-        pso.search()
-        n_clusters, mean_cluster_size, n_outliers = get_statistics(pso.g_best.best_epsilon, pso.g_best.best_min_samples, self.data)
+        n_clusters = None
+        mean_cluster_size = None
+        n_outliers = None
+        flag = True
+        while flag:
+            pso = DCMPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
+            pso.search()
+            if pso.g_best.evaluation < 10.0:
+                n_clusters, mean_cluster_size, n_outliers = get_statistics(pso.g_best.best_epsilon, pso.g_best.best_min_samples, self.data)
+                flag = False
+
         return [n_clusters, mean_cluster_size, n_outliers]
