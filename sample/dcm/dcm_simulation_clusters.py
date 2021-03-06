@@ -34,7 +34,6 @@ print("Running DCM with DCMPSO: {} simulations, {} iterations and {} particles".
 print("User Density: {} UEs/km2".format(user_density))
 
 total_results = []
-
 # TODO: Incluir o número de repetições na configuração DEFAULT
 for idx in range(simulations):
     # Current Step

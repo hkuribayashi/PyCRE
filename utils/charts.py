@@ -112,35 +112,71 @@ def get_visual_pareto(data):
     plt.show()
 
 
-def get_boxplot(data_local, data_servidor, path, filename):
-    mean_data_local = data_local.mean(axis=0)
-    mean_data_servidor = data_servidor.mean(axis=0)
+def get_barchart(cluster_data, path, z=1.64):
+    clusters_bar = []
+    samples_bar = []
+    outliers_bar = []
 
-    std_data_local = data_local.std(axis=0)
-    std_data_servidor = data_servidor.std(axis=0)
+    error_cluster = []
+    error_samples = []
+    error_outliers = []
 
+    for c_data in cluster_data:
+        # Get Mean and Standard Deviation
+        mean = c_data.mean(axis=0)
+        std = c_data.std(axis=0)
 
+        # Append data
+        clusters_bar.append(mean['Number of Clusters'])
+        samples_bar.append(mean['Number of Samples per Clusters'])
+        outliers_bar.append(mean['Number of Outliers'])
 
-    bar_mean = [mean_data_local['Number of Clusters'], mean_data_servidor['Number of Clusters']]
+        # Compute SE and CI
+        # Number of Clusters
+        se_clusters = std['Number of Clusters']/np.sqrt(len(c_data))
+        lcb_clusters = mean['Number of Clusters'] - z * se_clusters
+        ucb_clusters = mean['Number of Clusters'] + z * se_clusters
+        error_cluster.append((lcb_clusters, ucb_clusters))
 
-    se_data_local= std_data_local['Number of Clusters'] / np.sqrt(50)
-    se_data_servidor = std_data_servidor['Number of Clusters'] / np.sqrt(50)
+        # Number of Samples per Clusters
+        se_samples = std['Number of Samples per Clusters'] / np.sqrt(len(c_data))
+        lcb_samples = mean['Number of Samples per Clusters'] - z * se_samples
+        ucb_samples = mean['Number of Samples per Clusters'] + z * se_samples
+        error_samples.append((lcb_samples, ucb_samples))
 
-    z = 1.96
+        # Number of Outliers
+        se_outliers = std['Number of Outliers'] / np.sqrt(len(c_data))
+        lcb_outliers = mean['Number of Outliers'] - z * se_outliers
+        ucb_outliers = mean['Number of Outliers'] + z * se_outliers
+        error_outliers.append((lcb_outliers, ucb_outliers))
 
-    lcb_data_local = mean_data_local['Number of Clusters'] - z * se_data_local
-    ucb_data_local = mean_data_local['Number of Clusters'] + z * se_data_local
+    bar_position = [0, 1.5, 3, 4.5]
 
-    lcb_data_servidor = mean_data_servidor['Number of Clusters'] - z * se_data_servidor
-    ucb_data_servidor = mean_data_servidor['Number of Clusters'] + z * se_data_servidor
+    # Clusters
+    # plt.bar(bar_position, clusters_bar, yerr=error_cluster, capsize=7, width=0.5, zorder=10)
+    plt.bar(bar_position, clusters_bar, capsize=7, width=0.5, zorder=10)
+    plt.xticks(bar_position, ('300', '600', '900', '1200'))
+    plt.xlabel('Mean User Density [UE/km2]')
+    plt.ylabel('Mean Number of Clusters')
+    plt.grid(linestyle=':', zorder=1)
+    plt.savefig('{}{}'.format(path, "mean_number_of_clusters.eps"), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
 
-    errors = [(lcb_data_local, ucb_data_local), (lcb_data_servidor, ucb_data_servidor)]
+    # Samples
+    plt.figure()
+    # plt.bar(bar_position, samples_bar, yerr=error_samples, capsize=7, width=0.5, zorder=10)
+    plt.bar(bar_position, samples_bar, capsize=7, width=0.5, zorder=10)
+    plt.xticks(bar_position, ('300', '600', '900', '1200'))
+    plt.xlabel('Mean User Density [UE/km2]')
+    plt.ylabel('Mean Number of Samples per Clusters')
+    plt.grid(linestyle=':', zorder=1)
+    plt.savefig('{}{}'.format(path, "mean_number_of_samples_per_cluster.eps"), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
 
-    bar_position = [0, 3]
-
-    plt.bar(bar_position, bar_mean, yerr=errors, capsize=7)
-    plt.xticks(bar_position, ('Local', 'Servidor'))
-
-    # Save Fig
-    plt.savefig('{}{}'.format(path, filename), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
-    plt.close()
+    # Outliers
+    plt.figure()
+    # plt.bar(bar_position, outliers_bar, yerr=error_outliers, capsize=7, width=0.5, zorder=10)
+    plt.bar(bar_position, outliers_bar, capsize=7, width=0.5, zorder=10)
+    plt.xticks(bar_position, ('300', '600', '900', '1200'))
+    plt.xlabel('Mean User Density [UE/km2]')
+    plt.ylabel('Mean Number of Outliers')
+    plt.grid(linestyle=':', zorder=1)
+    plt.savefig('{}{}'.format(path, "mean_number_of_outliers.eps"), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')

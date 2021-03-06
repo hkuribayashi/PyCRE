@@ -1,13 +1,18 @@
-from utils.charts import get_boxplot
+from utils.charts import get_barchart
 from utils.misc import load_from_csv
 
 path = "/Users/hugo/Desktop/PyCRE/dcm/images/"
-filename = "boxplot.eps"
 
-data_local = load_from_csv("/Users/hugo/Desktop/PyCRE/dcm/csv/", "dcm_cluster_statistics_300-local.csv")
-data_servidor = load_from_csv("/Users/hugo/Desktop/PyCRE/dcm/csv/", "dcm_cluster_statistics_300-servidor.csv")
+data_300 = load_from_csv("/Users/hugo/Desktop/PyCRE/dcm/csv/", "dcm_cluster_statistics_300-c.csv")
+data_600 = load_from_csv("/Users/hugo/Desktop/PyCRE/dcm/csv/", "dcm_cluster_statistics_600-c.csv")
+data_900 = load_from_csv("/Users/hugo/Desktop/PyCRE/dcm/csv/", "dcm_cluster_statistics_900-c.csv")
+data_1200 = load_from_csv("/Users/hugo/Desktop/PyCRE/dcm/csv/", "dcm_cluster_statistics_1200-c.csv")
 
-data_local.columns = ['Number of Clusters', 'Number of Samples per Clusters', 'Number of Outliers']
-data_servidor.columns = ['Number of Clusters', 'Number of Samples per Clusters', 'Number of Outliers']
+data_300.columns = ['Number of Clusters', 'Number of Samples per Clusters', 'Number of Outliers']
+data_600.columns = ['Number of Clusters', 'Number of Samples per Clusters', 'Number of Outliers']
+data_900.columns = ['Number of Clusters', 'Number of Samples per Clusters', 'Number of Outliers']
+data_1200.columns = ['Number of Clusters', 'Number of Samples per Clusters', 'Number of Outliers']
 
-get_boxplot(data_local, data_servidor, path, filename)
+cluster_data = [data_300, data_600, data_900, data_1200]
+
+get_barchart(cluster_data, path)
