@@ -4,8 +4,10 @@ from collections import Counter
 
 from sklearn.cluster import DBSCAN
 from clustering.Cluster import Cluster
+from clustering.ClusteringMethod import ClusteringMethod
 from clustering.PSOAlgorithm import PSOAlgorithm
 from si.pso.CoPSO import CoPSO
+from si.pso.DCMKPSO import DCMKPSO
 from si.pso.IncreaseIWPSO import IncreaseIWPSO
 from si.pso.StochasticIWPSO import StochasticIWPSO
 from si.pso.DCMPSO import DCMPSO
@@ -129,12 +131,22 @@ class DCM:
         n_clusters = None
         mean_cluster_size = None
         n_outliers = None
-        flag = True
-        while flag:
-            pso = DCMPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
-            pso.search()
-            if pso.g_best.evaluation < 10.0:
-                n_clusters, mean_cluster_size, n_outliers = get_statistics(pso.g_best.best_epsilon, pso.g_best.best_min_samples, self.data)
-                flag = False
+        if self.method is ClusteringMethod.DBSCAN:
+            flag = True
+            while flag:
+                pso = DCMPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
+                pso.search()
+                if pso.g_best.evaluation < 10.0:
+                    n_clusters, mean_cluster_size, n_outliers = get_statistics(pso.g_best.best_epsilon, pso.g_best.best_min_samples, self.data)
+                    flag = False
+        elif self.method is ClusteringMethod.KMEANS:
+            flag = True
+            while flag:
+                pso = DCMKPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
+                pso.search()
+                if pso.g_best.evaluation < 10.0:
+                    n_clusters, mean_cluster_size, n_outliers = get_statistics(pso.g_best.best_epsilon,
+                                                                               pso.g_best.best_min_samples, self.data)
+                    flag = False
 
         return [n_clusters, mean_cluster_size, n_outliers]
