@@ -94,7 +94,7 @@ def get_statistics_dbscan(epsilon, min_samples, data):
 
 
 def get_statistics_kmeans(k, data):
-    new_k = get_int(k)
+    new_k = get_int(k, len(data))
     db_cluster = KMeans(n_clusters=new_k, random_state=170).fit(data)
     labels = db_cluster.labels_
     n_noise_ = list(labels).count(-1)
