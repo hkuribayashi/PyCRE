@@ -113,70 +113,91 @@ def get_visual_pareto(data):
 
 
 def get_barchart(cluster_data, path, z=1.64):
-    clusters_bar = []
-    samples_bar = []
-    outliers_bar = []
 
-    error_cluster = []
-    error_samples = []
-    error_outliers = []
+    # Bar position
+    bar_position_left = [0, 3.0, 6.0, 9.0]
+    bar_position_center = [0.6, 3.6, 6.6, 9.6]
+    bar_position_right = [1.2, 4.2, 7.2, 10.2]
 
-    for c_data in cluster_data:
-        # Get Mean and Standard Deviation
-        mean = c_data.mean(axis=0)
-        std = c_data.std(axis=0)
+    for key in cluster_data:
+        data = cluster_data[key]
 
-        # Append data
-        clusters_bar.append(mean['Number of Clusters'])
-        samples_bar.append(mean['Number of Samples per Clusters'])
-        outliers_bar.append(mean['Number of Outliers'])
+        clusters_bar = []
+        samples_bar = []
+        outliers_bar = []
 
-        # Compute SE and CI
-        # Number of Clusters
-        se_clusters = std['Number of Clusters']/np.sqrt(len(c_data))
-        lcb_clusters = mean['Number of Clusters'] - z * se_clusters
-        ucb_clusters = mean['Number of Clusters'] + z * se_clusters
-        error_cluster.append((lcb_clusters, ucb_clusters))
+        error_cluster = []
+        error_samples = []
+        error_outliers = []
 
-        # Number of Samples per Clusters
-        se_samples = std['Number of Samples per Clusters'] / np.sqrt(len(c_data))
-        lcb_samples = mean['Number of Samples per Clusters'] - z * se_samples
-        ucb_samples = mean['Number of Samples per Clusters'] + z * se_samples
-        error_samples.append((lcb_samples, ucb_samples))
+        for d_ in data:
+            # Get Mean and Standard Deviation
+            mean = d_.mean(axis=0)
+            std = d_.std(axis=0)
 
-        # Number of Outliers
-        se_outliers = std['Number of Outliers'] / np.sqrt(len(c_data))
-        lcb_outliers = mean['Number of Outliers'] - z * se_outliers
-        ucb_outliers = mean['Number of Outliers'] + z * se_outliers
-        error_outliers.append((lcb_outliers, ucb_outliers))
+            # Append data
+            clusters_bar.append(mean['Number of Clusters'])
+            samples_bar.append(mean['Number of Samples per Clusters'])
+            outliers_bar.append(mean['Number of Outliers'])
 
-    bar_position = [0, 1.5, 3, 4.5]
+            # Compute SE and CI
+            # Number of Clusters
+            se_clusters = std['Number of Clusters']/np.sqrt(len(d_))
+            lcb_clusters = mean['Number of Clusters'] - z * se_clusters
+            ucb_clusters = mean['Number of Clusters'] + z * se_clusters
+            error_cluster.append([lcb_clusters, ucb_clusters])
 
-    # Clusters
-    # plt.bar(bar_position, clusters_bar, yerr=error_cluster, capsize=7, width=0.5, zorder=10)
-    plt.bar(bar_position, clusters_bar, capsize=7, width=0.5, zorder=10)
-    plt.xticks(bar_position, ('300', '600', '900', '1200'))
-    plt.xlabel('Mean User Density [UE/km2]')
-    plt.ylabel('Mean Number of Clusters')
-    plt.grid(linestyle=':', zorder=1)
-    plt.savefig('{}{}'.format(path, "mean_number_of_clusters.eps"), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+            # Number of Samples per Clusters
+            se_samples = std['Number of Samples per Clusters'] / np.sqrt(len(d_))
+            lcb_samples = mean['Number of Samples per Clusters'] - z * se_samples
+            ucb_samples = mean['Number of Samples per Clusters'] + z * se_samples
+            error_samples.append([lcb_samples, ucb_samples])
 
-    # Samples
-    plt.figure()
-    # plt.bar(bar_position, samples_bar, yerr=error_samples, capsize=7, width=0.5, zorder=10)
-    plt.bar(bar_position, samples_bar, capsize=7, width=0.5, zorder=10)
-    plt.xticks(bar_position, ('300', '600', '900', '1200'))
-    plt.xlabel('Mean User Density [UE/km2]')
-    plt.ylabel('Mean Number of Samples per Clusters')
-    plt.grid(linestyle=':', zorder=1)
-    plt.savefig('{}{}'.format(path, "mean_number_of_samples_per_cluster.eps"), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+            # Number of Outliers
+            se_outliers = std['Number of Outliers'] / np.sqrt(len(d_))
+            lcb_outliers = mean['Number of Outliers'] - z * se_outliers
+            ucb_outliers = mean['Number of Outliers'] + z * se_outliers
+            error_outliers.append([lcb_outliers, ucb_outliers])
 
-    # Outliers
-    plt.figure()
-    # plt.bar(bar_position, outliers_bar, yerr=error_outliers, capsize=7, width=0.5, zorder=10)
-    plt.bar(bar_position, outliers_bar, capsize=7, width=0.5, zorder=10)
-    plt.xticks(bar_position, ('300', '600', '900', '1200'))
-    plt.xlabel('Mean User Density [UE/km2]')
-    plt.ylabel('Mean Number of Outliers')
-    plt.grid(linestyle=':', zorder=1)
-    plt.savefig('{}{}'.format(path, "mean_number_of_outliers.eps"), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+        error_cluster = np.array(error_cluster).T.tolist()
+        error_samples = np.array(error_samples).T.tolist()
+        error_outliers = np.array(error_outliers).T.tolist()
+
+        if key is 'DBSCAN':
+            position = bar_position_left
+            color = '#1f77b4'
+        elif key is 'KMeans':
+            position = bar_position_center
+            color = '#db6269'
+        else:
+            position = bar_position_right
+            color = '#ecab00'
+
+        # Clusters
+        plt.figure(1)
+        plt.bar(position, clusters_bar, yerr=error_cluster, capsize=7, width=0.5, zorder=10, label=key, color=color)
+
+        plt.figure(2)
+        plt.bar(position, samples_bar, yerr=error_samples, capsize=7, width=0.5, zorder=10, label=key, color=color)
+
+        plt.figure(3)
+        plt.bar(position, outliers_bar, yerr=error_outliers, capsize=7, width=0.5, zorder=10, label=key, color=color)
+
+    for id_ in range(1,4):
+        if id_ is 1:
+            ylabel = 'Mean Number of Clusters'
+            filename = 'mean_number_of_clusters'
+        elif id_ is 2:
+            ylabel = 'Mean Number of Samples per Clusters'
+            filename = 'mean_number_of_samples_per_clusters'
+        else:
+            ylabel = 'Mean Number of Outliers'
+            filename = 'mean_number_of_outliers'
+
+        plt.figure(id_)
+        plt.xticks(bar_position_center, ('300', '600', '900', '1200'))
+        plt.xlabel('Mean User Density [UE/km2]')
+        plt.ylabel(ylabel)
+        plt.grid(linestyle=':', zorder=1)
+        plt.legend(loc='best')
+        plt.savefig('{}{}'.format(path, "{}.eps".format(filename)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')

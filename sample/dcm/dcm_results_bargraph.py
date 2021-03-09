@@ -13,6 +13,10 @@ data_600.columns = ['Number of Clusters', 'Number of Samples per Clusters', 'Num
 data_900.columns = ['Number of Clusters', 'Number of Samples per Clusters', 'Number of Outliers']
 data_1200.columns = ['Number of Clusters', 'Number of Samples per Clusters', 'Number of Outliers']
 
-cluster_data = [data_300, data_600, data_900, data_1200]
+dbscan_data = [data_300, data_600, data_900, data_1200]
+kmeans_data = [data_300, data_600, data_900, data_1200]
+other_data = [data_300, data_600, data_900, data_1200]
 
-get_barchart(cluster_data, path)
+data = {'DBSCAN': dbscan_data, 'KMeans': kmeans_data, 'Other': other_data}
+
+get_barchart(data, path)

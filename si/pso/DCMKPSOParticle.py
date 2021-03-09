@@ -3,11 +3,13 @@ import random
 from sklearn.cluster import KMeans
 from sklearn.metrics import davies_bouldin_score, silhouette_score
 
+from utils.misc import get_int
+
 
 class DCMKPSOParticle():
 
     def __init__(self, clustering_method, data_size, cognitive_factor):
-        self.k = random.randint(3, 10)
+        self.k = random.uniform(3, int(0.1 * data_size))
         self.best_k = self.k
         self.evaluation = 10.0
         self.data_size = data_size
@@ -16,7 +18,8 @@ class DCMKPSOParticle():
         self.c2 = cognitive_factor[1]
 
     def evaluate(self, data):
-        kmeans = KMeans(n_clusters=self.k, random_state=170).fit(data)
+        n_clusters = get_int(self.k, len(data))
+        kmeans = KMeans(n_clusters=n_clusters, init='k-means++', max_iter=100, random_state=100, algorithm='full').fit(data)
 
         # Get the cluster's labels and total number of clusters
         labels = kmeans.labels_
@@ -38,10 +41,4 @@ class DCMKPSOParticle():
                            (g_best.best_k - self.k) * phi2 * self.c2
 
         # Update k position
-        self.k = int(self.k + (inertia_weight * velocity_k))
-
-        # Epsilon Constraint
-        if self.k < 3:
-            self.k = 3
-        elif self.k > 10:
-            self.k = 10
+        self.k = self.k + (inertia_weight * velocity_k)

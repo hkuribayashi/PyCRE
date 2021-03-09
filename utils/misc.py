@@ -1,7 +1,7 @@
 import csv
 import pandas as pd
 import numpy as np
-from sklearn.cluster import DBSCAN
+from sklearn.cluster import DBSCAN, KMeans
 
 
 def get_pathloss(type_, distance):
@@ -80,13 +80,27 @@ def get_k_closest_bs(ue, bs_list):
     return closest_bs
 
 
-def get_statistics(epsilon, min_samples, data):
+def get_statistics_dbscan(epsilon, min_samples, data):
     db_cluster = DBSCAN(eps=epsilon, min_samples=min_samples).fit(data)
     labels = db_cluster.labels_
     n_noise_ = list(labels).count(-1)
     n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
     if n_clusters_ >= 1:
-        mean_cluster_size = (len(data) - n_noise_)/n_clusters_
+        mean_cluster_size = (len(data) - n_noise_) / n_clusters_
+    else:
+        mean_cluster_size = 0
+
+    return n_clusters_, mean_cluster_size, n_noise_
+
+
+def get_statistics_kmeans(k, data):
+    new_k = get_int(k)
+    db_cluster = KMeans(n_clusters=new_k, random_state=170).fit(data)
+    labels = db_cluster.labels_
+    n_noise_ = list(labels).count(-1)
+    n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+    if n_clusters_ >= 1:
+        mean_cluster_size = (len(data) - n_noise_) / n_clusters_
     else:
         mean_cluster_size = 0
 
@@ -119,3 +133,15 @@ def get_ippp(simulation_area, lambda0, thinning_probability=0.4):
     yyRetained = yy[booleRetained] * side_length
 
     return xxRetained, yyRetained
+
+
+def get_int(k_number, data_size):
+    max = int(0.1 * data_size)
+    result = int(k_number)
+    if k_number < 3:
+        result = 3
+    elif k_number > max:
+        result = max
+    elif k_number - result >= 0.5:
+        result += 1
+    return result

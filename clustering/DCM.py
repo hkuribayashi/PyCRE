@@ -12,7 +12,7 @@ from si.pso.IncreaseIWPSO import IncreaseIWPSO
 from si.pso.StochasticIWPSO import StochasticIWPSO
 from si.pso.DCMPSO import DCMPSO
 from utils.charts import get_visual_cluster
-from utils.misc import get_k_closest_bs, get_statistics
+from utils.misc import get_k_closest_bs, get_statistics_dbscan, get_statistics_kmeans
 
 
 class DCM:
@@ -137,7 +137,7 @@ class DCM:
                 pso = DCMPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
                 pso.search()
                 if pso.g_best.evaluation < 10.0:
-                    n_clusters, mean_cluster_size, n_outliers = get_statistics(pso.g_best.best_epsilon, pso.g_best.best_min_samples, self.data)
+                    n_clusters, mean_cluster_size, n_outliers = get_statistics_dbscan(pso.g_best.best_epsilon, pso.g_best.best_min_samples, self.data)
                     flag = False
         elif self.method is ClusteringMethod.KMEANS:
             flag = True
@@ -145,8 +145,8 @@ class DCM:
                 pso = DCMKPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
                 pso.search()
                 if pso.g_best.evaluation < 10.0:
-                    n_clusters, mean_cluster_size, n_outliers = get_statistics(pso.g_best.best_epsilon,
-                                                                               pso.g_best.best_min_samples, self.data)
+                    n_clusters, mean_cluster_size, n_outliers = get_statistics_kmeans(pso.g_best.best_k,
+                                                                                      self.data)
                     flag = False
 
         return [n_clusters, mean_cluster_size, n_outliers]

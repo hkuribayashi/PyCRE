@@ -47,7 +47,8 @@ class DCMKPSO(PSO):
         return current_global_evaluation, current_gbest_evaluation
 
     def search(self):
-        print("Starting DCMKPSO Engine with {} particles and {} iterations".format(len(self.population), self.max_steps))
+        print(
+            "Starting DCMKPSO Engine with {} particles and {} iterations".format(len(self.population), self.max_steps))
         counter = 0
         k = 0
         while counter < self.max_steps:
@@ -80,7 +81,7 @@ class DCMKPSO(PSO):
 
                 for i in range(size_excluded):
                     p = DCMKPSOParticle(self.clustering_method, len(self.data), self.cognitive_factor)
-                    random_k = random.uniform(1.0, 3.0)
+                    random_k = random.uniform(0.5, 2.0)
                     new_k = int(self.g_best.k * random_k)
                     p.k = new_k
                     try:
@@ -100,10 +101,9 @@ class DCMKPSO(PSO):
             self.mean_evaluation_evolution.append(self.global_evaluation)
             self.gbest_evaluation_evolution.append(self.g_best.evaluation)
 
-            print('Iteration {} - Evaluation: {} | Gbest: {} | k: {} | clusters: {}'.format(counter,
-                                                                                            self.global_evaluation,
-                                                                                            self.g_best.evaluation,
-                                                                                            k,
-                                                                                            self.g_best.k))
-
+            print('Iteration: {} | Evaluation: {} | Gbest: {} | k: {} | clusters: {}'.format(counter,
+                                                                                             self.global_evaluation,
+                                                                                             self.g_best.evaluation,
+                                                                                             k,
+                                                                                             self.g_best.k))
             counter += 1
