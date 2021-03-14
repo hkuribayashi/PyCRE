@@ -112,12 +112,29 @@ def get_visual_pareto(data):
     plt.show()
 
 
-def get_barchart(cluster_data, path, z=1.64):
+def get_violinchart(data, key):
+    # library & dataset
+    # plot
+    sns.violinplot(x=data["Algorithm"], y=data["Mean Number of Samples per Clusters"])
+    plt.grid(linestyle=':', zorder=1)
+    plt.legend(loc='best')
+    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_violin_number_of_clusters_{}.eps".format(key)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+
+    plt.figure()
+    sns.violinplot(x=data["Algorithm"], y=data["Mean Number of Clusters"])
+    plt.grid(linestyle=':', zorder=1)
+    plt.legend(loc='best')
+    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_violin_number_of_samples_{}.eps".format(key)),
+                dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+
+
+
+def get_barchart(cluster_data, path, z=1.96):
 
     # Bar position
-    bar_position_left = [0, 3.0, 6.0, 9.0]
-    bar_position_center = [0.6, 3.6, 6.6, 9.6]
-    bar_position_right = [1.2, 4.2, 7.2, 10.2]
+    bar_position_left = [0, 3.0, 6.0]
+    bar_position_center = [0.6, 3.6, 6.6]
+    bar_position_right = [1.2, 4.2, 7.2]
 
     for key in cluster_data:
         data = cluster_data[key]
@@ -195,7 +212,7 @@ def get_barchart(cluster_data, path, z=1.64):
             filename = 'mean_number_of_outliers'
 
         plt.figure(id_)
-        plt.xticks(bar_position_center, ('300', '600', '900', '1200'))
+        plt.xticks(bar_position_center, ('300', '600', '900'))
         plt.xlabel('Mean User Density [UE/km2]')
         plt.ylabel(ylabel)
         plt.grid(linestyle=':', zorder=1)

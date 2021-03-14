@@ -1,12 +1,12 @@
 import random
 from operator import attrgetter
 
-from si.pso.DCMKPSOParticle import DCMKPSOParticle
+from si.pso.DCMBPSOParticle import DCMBPSOParticle
 from si.pso.PSO import PSO
-from utils.misc import get_int
+from utils.misc import get_int, get_int_2
 
 
-class DCMKPSO(PSO):
+class DCMBPSO(PSO):
 
     def __init__(self, data, population_size, max_steps, clustering_method, inertia_weight, cognitive_factor):
         super().__init__(data, max_steps, clustering_method)
@@ -19,7 +19,7 @@ class DCMKPSO(PSO):
 
         # Create the PSO population
         for i in range(population_size):
-            self.population.append(DCMKPSOParticle(self.clustering_method, len(self.data), cognitive_factor))
+            self.population.append(DCMBPSOParticle(self.clustering_method, len(self.data), cognitive_factor))
 
         # Initialize the inertia weight list
         initial_inertia = inertia_weight[0]
@@ -49,7 +49,7 @@ class DCMKPSO(PSO):
 
     def search(self):
         print(
-            "Starting DCMKPSO Engine with {} particles and {} iterations".format(len(self.population), self.max_steps))
+            "Starting DCMBPSO Engine with {} particles and {} iterations".format(len(self.population), self.max_steps))
         counter = 0
         k = 0
         while counter < self.max_steps:
@@ -74,17 +74,23 @@ class DCMKPSO(PSO):
                 self.population = selected_population
 
                 if size_excluded == 0:
-                    size_excluded = int(0.1 * len(self.population))
+                    size_excluded = int(0.2 * len(self.population))
                 if size_excluded == 0 or size_excluded == 200:
-                    size_excluded = 1
+                    size_excluded = 10
 
                 print("==========> Reseting {} particles".format(size_excluded))
 
                 for i in range(size_excluded):
-                    p = DCMKPSOParticle(self.clustering_method, len(self.data), self.cognitive_factor)
-                    random_k = random.uniform(0.5, 2.0)
+                    # Creating a new Partcile
+                    p = DCMBPSOParticle(self.clustering_method, len(self.data), self.cognitive_factor)
+
+                    random_k = random.uniform(0.1, 3.0)
                     new_k = get_int(self.g_best.k * random_k, len(self.data))
                     p.k = new_k
+
+                    new_branching_factor = get_int_2(self.g_best.branching_factor * random_k)
+                    p.branching_factor = new_branching_factor
+
                     try:
                         p.evaluate(self.data)
                     except:
@@ -102,9 +108,10 @@ class DCMKPSO(PSO):
             self.mean_evaluation_evolution.append(self.global_evaluation)
             self.gbest_evaluation_evolution.append(self.g_best.evaluation)
 
-            print('Iteration: {} | Evaluation: {} | Gbest: {} | k: {} | clusters: {}'.format(counter,
-                                                                                             self.global_evaluation,
-                                                                                             self.g_best.evaluation,
-                                                                                             k,
-                                                                                             self.g_best.k))
+            print('Iteration: {} | Evaluation: {} | Gbest: {} | k: {} | clusters: {} | bf: {}'.format(counter,
+                                                                                                      self.global_evaluation,
+                                                                                                      self.g_best.evaluation,
+                                                                                                      k,
+                                                                                                      self.g_best.k,
+                                                                                                      self.g_best.branching_factor))
             counter += 1

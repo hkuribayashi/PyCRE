@@ -7,12 +7,13 @@ from clustering.Cluster import Cluster
 from clustering.ClusteringMethod import ClusteringMethod
 from clustering.PSOAlgorithm import PSOAlgorithm
 from si.pso.CoPSO import CoPSO
+from si.pso.DCMBPSO import DCMBPSO
 from si.pso.DCMKPSO import DCMKPSO
 from si.pso.IncreaseIWPSO import IncreaseIWPSO
 from si.pso.StochasticIWPSO import StochasticIWPSO
 from si.pso.DCMPSO import DCMPSO
 from utils.charts import get_visual_cluster
-from utils.misc import get_k_closest_bs, get_statistics_dbscan, get_statistics_kmeans
+from utils.misc import get_k_closest_bs, get_statistics_dbscan, get_statistics_kmeans, get_statistics_birch
 
 
 class DCM:
@@ -147,6 +148,24 @@ class DCM:
                 if pso.g_best.evaluation < 10.0:
                     n_clusters, mean_cluster_size, n_outliers = get_statistics_kmeans(pso.g_best.best_k,
                                                                                       self.data)
+                    flag = False
+        elif self.method is ClusteringMethod.BIRCH:
+            flag = True
+            while flag:
+                pso = DCMBPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
+                pso.search()
+                if pso.g_best.evaluation < 10.0:
+                    n_clusters, mean_cluster_size, n_outliers = get_statistics_birch(pso.g_best.best_k,
+                                                                                     self.data)
+                    flag = False
+        elif self.method is ClusteringMethod.GAUSSIAN_MIX:
+            flag = True
+            while flag:
+                pso = DCMBPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
+                pso.search()
+                if pso.g_best.evaluation < 10.0:
+                    n_clusters, mean_cluster_size, n_outliers = get_statistics_birch(pso.g_best.best_k,
+                                                                                     self.data)
                     flag = False
 
         return [n_clusters, mean_cluster_size, n_outliers]

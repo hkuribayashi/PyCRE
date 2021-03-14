@@ -1,7 +1,7 @@
 import csv
 import pandas as pd
 import numpy as np
-from sklearn.cluster import DBSCAN, KMeans
+from sklearn.cluster import DBSCAN, KMeans, Birch
 
 
 def get_pathloss(type_, distance):
@@ -107,6 +107,34 @@ def get_statistics_kmeans(k, data):
     return n_clusters_, mean_cluster_size, n_noise_
 
 
+def get_statistics_birch(k, data):
+    new_k = get_int(k, len(data))
+    db_cluster = Birch(n_clusters=new_k).fit(data)
+    labels = db_cluster.labels_
+    n_noise_ = list(labels).count(-1)
+    n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+    if n_clusters_ >= 1:
+        mean_cluster_size = (len(data) - n_noise_) / n_clusters_
+    else:
+        mean_cluster_size = 0
+
+    return n_clusters_, mean_cluster_size, n_noise_
+
+
+def get_statistics_gaussian(k, data):
+    new_k = get_int(k, len(data))
+    db_cluster = Birch(n_clusters=new_k).fit(data)
+    labels = db_cluster.labels_
+    n_noise_ = list(labels).count(-1)
+    n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+    if n_clusters_ >= 1:
+        mean_cluster_size = (len(data) - n_noise_) / n_clusters_
+    else:
+        mean_cluster_size = 0
+
+    return n_clusters_, mean_cluster_size, n_noise_
+
+
 def get_ippp(simulation_area, lambda0, thinning_probability=0.4):
     side_length = np.sqrt(simulation_area)
 
@@ -136,12 +164,22 @@ def get_ippp(simulation_area, lambda0, thinning_probability=0.4):
 
 
 def get_int(k_number, data_size):
-    max = int(0.1 * data_size)
+    max_ = int(0.1 * data_size)
     result = int(k_number)
     if k_number < 3:
         result = 3
-    elif k_number > max:
-        result = max
+    elif k_number > max_:
+        result = max_
     elif k_number - result >= 0.5:
         result += 1
+    return result
+
+def get_int_2(branching_factor):
+
+    if branching_factor < 10:
+        result = 10
+    elif branching_factor > 50:
+        result = 50
+    else:
+        result = int(branching_factor)
     return result

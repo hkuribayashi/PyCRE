@@ -27,6 +27,9 @@ class DCMPSO(PSO):
             current_inertia = initial_inertia + ((step / max_steps) * (final_inertia - initial_inertia))
             self.inertia_weight.append(current_inertia)
 
+    def populate(self):
+        pass
+
     def evaluate(self):
         # Initialize aux variable
         sum_temp = 0
