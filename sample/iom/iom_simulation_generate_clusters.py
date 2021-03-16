@@ -20,6 +20,9 @@ min_cluster_size = int(sys.argv[3])
 # Get the max cluster size
 max_cluster_size = int(sys.argv[4])
 
+# Path
+path = sys.argv[5]
+
 # Debug
 print("Running DCM with DCMPSO")
 
@@ -48,7 +51,7 @@ while counter < n_clusters:
             cluster_list.append(target_cluster)
             counter += 1
 
-filename = "/Users/hugo/Desktop/PyCRE/iom/data/cluster_list_{}.obj".format(user_density)
+filename = "{}cluster_list_{}.obj".format(path, user_density)
 file = open(filename, 'wb')
 
 pickle.dump(cluster_list, file)
