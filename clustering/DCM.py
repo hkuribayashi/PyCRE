@@ -2,7 +2,7 @@ import numpy as np
 import itertools
 from collections import Counter
 
-from sklearn.cluster import DBSCAN
+from sklearn.cluster import DBSCAN, KMeans, Birch
 from clustering.Cluster import Cluster
 from clustering.ClusteringMethod import ClusteringMethod
 from clustering.PSOAlgorithm import PSOAlgorithm
@@ -13,11 +13,11 @@ from si.pso.IncreaseIWPSO import IncreaseIWPSO
 from si.pso.StochasticIWPSO import StochasticIWPSO
 from si.pso.DCMPSO import DCMPSO
 from utils.charts import get_visual_cluster
-from utils.misc import get_k_closest_bs, get_statistics_dbscan, get_statistics_kmeans, get_statistics_birch
+from utils.misc import get_k_closest_bs, get_statistics_dbscan, get_statistics_kmeans, get_statistics_birch, get_int, get_int_2
 
 
 class DCM:
-    def __init__(self, clustering_method, pso_algorithm, hetnet, user_density, min_samples=None, epsilon=None):
+    def __init__(self, clustering_method, pso_algorithm, hetnet, user_density):
         self.method = clustering_method
         self.pso_algorithm = pso_algorithm
         self.data = []
@@ -29,45 +29,36 @@ class DCM:
         self.ordinary_ues_weight = hetnet.env.ordinary_ues_weight
         self.outage_threshold = hetnet.env.outage_threshold
         self.user_density = user_density
-        self.min_samples = min_samples
-        self.epsilon = epsilon
-        self.db = None
+        self.clustering_output = None
 
         # Extract UE position to a numpy array
         for ue in self.ue_list:
             self.data.append([ue.point.x, ue.point.y])
         self.data = np.array(self.data)
 
-    # TODO: Incluir parametros na configuração DEFAULT
-    def compute_clusters(self, population_size=200, max_steps=150):
-        # Compute clusters
-        if self.min_samples is None and self.epsilon is None:
-            self.__get_optimized_cluster(population_size, max_steps)
-        else:
-            self.__get_static_cluster()
-
+    def compute_clusters(self, population_size=150, max_steps=150):
+        self.__get_optimized_cluster(population_size, max_steps)
         self.__get_target_clusters()
         self.__get_evaluation_per_cluster()
         self.__compute_bs_per_cluster()
 
-    def __get_static_cluster(self):
-        self.db = DBSCAN(min_samples=self.min_samples, eps=self.epsilon).fit(self.data)
-
     def __get_optimized_cluster(self, population_size, max_steps):
-        # Start the DCMPSO Engine
-        pso = DCMPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
-        pso.search()
-        self.min_samples = pso.g_best.best_min_samples
-        self.epsilon = pso.g_best.best_epsilon
+        if self.method == ClusteringMethod.DBSCAN:
+            pso = DCMPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
+            pso.search()
+            self.clustering_output = DBSCAN(min_samples=pso.g_best.best_min_samples, eps=pso.g_best.best_epsilon).fit(self.data)
 
-        # Generate the optimized cluster
-        self.db = DBSCAN(min_samples=self.min_samples, eps=self.epsilon).fit(self.data)
-
-        # Visual representation
-        get_visual_cluster(self.db, self.data)
+        elif self.method == ClusteringMethod.KMEANS:
+            pso = DCMKPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
+            pso.search()
+            self.clustering_output = KMeans(n_clusters=pso.g_best.best_k, init='k-means++', max_iter=100, random_state=100, algorithm='full').fit(self.data)
+        elif self.method == ClusteringMethod.BIRCH:
+            pso = DCMBPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
+            pso.search()
+            self.clustering_output = Birch(n_clusters=get_int(pso.g_best.best_k, len(self.data)), branching_factor=get_int_2(pso.g_best.best_branching_factor)).fit(self.data)
 
     def __get_target_clusters(self):
-        labels = self.db.labels_
+        labels = self.clustering_output.labels_
 
         counter = Counter(labels.tolist())
         grouped_labels = [[k, ]*v for k, v in counter.items()]
@@ -128,7 +119,7 @@ class DCM:
             self.optimization_output = {'SIWPSO-{}'.format(population_size): pso.mean_evaluation_evolution,
                                         'SIWPSO-{}-gbest'.format(population_size): pso.gbest_evaluation_evolution}
 
-    def get_cluster_analysis(self, population_size, max_steps=30):
+    def get_cluster_analysis(self, population_size=150, max_steps=30):
         n_clusters = None
         mean_cluster_size = None
         n_outliers = None
@@ -150,15 +141,6 @@ class DCM:
                                                                                       self.data)
                     flag = False
         elif self.method is ClusteringMethod.BIRCH:
-            flag = True
-            while flag:
-                pso = DCMBPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])
-                pso.search()
-                if pso.g_best.evaluation < 10.0:
-                    n_clusters, mean_cluster_size, n_outliers = get_statistics_birch(pso.g_best.best_k,
-                                                                                     self.data)
-                    flag = False
-        elif self.method is ClusteringMethod.GAUSSIAN_MIX:
             flag = True
             while flag:
                 pso = DCMBPSO(self.data, population_size, max_steps, self.method, [0.9, 0.6], [2.05, 2.05])

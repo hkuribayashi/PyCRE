@@ -4,6 +4,8 @@ from operator import attrgetter
 import numpy as np
 
 from mobility.ueQeue import SimpleQueue
+from mobility.point import Point
+from network.bs import BS
 from network.ne import NetworkElement
 from utils.charts import get_visual
 from utils.misc import get_pathloss, get_efficiency
@@ -18,6 +20,19 @@ class HetNet:
         self.env = env
         self.evaluation = dict(satisfaction=0.0, total_ue=0.0)
         self.ueQueue = SimpleQueue(env)
+
+    def populate_bs(self):
+        p0 = Point(0.0, 0.0, 35.0)
+        mbs = BS(0, 'MBS', p0)
+        self.add_bs(mbs)
+
+        counter = 1
+        for x in range(-500, 600, 100):
+            for y in range(-500, 600, 100):
+                if x != 0  and y != 0:
+                    sbs_point = Point(x, y, 10.0)
+                    sbs = BS(counter, 'SBS', sbs_point)
+                    self.add_bs(sbs)
 
     def add_bs(self, bs):
         if bs.type == 'MBS':
