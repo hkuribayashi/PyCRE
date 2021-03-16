@@ -15,7 +15,7 @@ for key in traffic_level:
     for alg in algorithms:
         csv_filename = 'mean_evolution_{}_pop_200_{}.csv'.format(key, alg)
         try:
-            mean_data = consolidate_results("/Users/hugo/Desktop/PyCRE/csv/", csv_filename)
+            mean_data = consolidate_results("/Users/hugo/Desktop/PyCRE/dcm/csv/", csv_filename)
         except FileNotFoundError:
             mean_data = []
         finally:
@@ -29,7 +29,7 @@ for key in traffic_level:
     for population in population_size:
         csv_filename = 'mean_evolution_{}_pop_{}_gbest_DCMPSO.csv'.format(key, population)
         try:
-            mean_data_1 = consolidate_results("/Users/hugo/Desktop/PyCRE/csv/", csv_filename)
+            mean_data_1 = consolidate_results("/Users/hugo/Desktop/PyCRE/dcm/csv/", csv_filename)
         except FileNotFoundError:
             mean_data_1 = []
         finally:
@@ -41,7 +41,7 @@ for key in traffic_level:
     for alg in algorithms:
         other_csv_filename = 'mean_evolution_{}_pop_200_gbest_{}.csv'.format(key, alg)
         try:
-            mean_data_o = consolidate_results("/Users/hugo/Desktop/PyCRE/csv/", other_csv_filename)
+            mean_data_o = consolidate_results("/Users/hugo/Desktop/PyCRE/dcm/csv/", other_csv_filename)
             if alg is 'SIWPSO':
                 mean_data_o = mean_data_o * 1.1
         except FileNotFoundError:

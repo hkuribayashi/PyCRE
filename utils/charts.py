@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from pandas import DataFrame
 import seaborn as sns
-import pandas as pd
 
 from config.network import Network
 
@@ -55,13 +54,13 @@ def get_evaluation_evolution(data, filename, marker='', xlim=None):
         plt.plot(data[key][5:149], marker, label=key, markersize=2.2)
 
     plt.xlabel('Iterations')
-    plt.ylabel('Davies-Bouldin Index')
+    plt.ylabel('Objective Function')
     plt.grid(linestyle=':')
     plt.legend(loc='best')
     if xlim is not None:
         plt.xlim(xlim)
 
-    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/images/", filename), dpi=Network.DEFAULT.image_resolution,
+    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", filename), dpi=Network.DEFAULT.image_resolution,
                 bbox_inches='tight')
     plt.close()
 
@@ -113,20 +112,28 @@ def get_visual_pareto(data):
 
 
 def get_violinchart(data, key):
-    # library & dataset
-    # plot
-    sns.violinplot(x=data["Algorithm"], y=data["Mean Number of Samples per Clusters"])
+    sns.violinplot(x=data["Algorithm"], y=data["Mean Number of Clusters"])
     plt.grid(linestyle=':', zorder=1)
-    plt.legend(loc='best')
     plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_violin_number_of_clusters_{}.eps".format(key)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
 
     plt.figure()
-    sns.violinplot(x=data["Algorithm"], y=data["Mean Number of Clusters"])
+    sns.violinplot(x=data["Algorithm"], y=data["Mean Number of Samples per Clusters"])
     plt.grid(linestyle=':', zorder=1)
-    plt.legend(loc='best')
     plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_violin_number_of_samples_{}.eps".format(key)),
                 dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
 
+
+def get_scatterplot(data, key):
+    sns.lmplot(x='index', y="Mean Number of Clusters", data=data.reset_index(), fit_reg=False, hue='Algorithm', legend=False, markers=["o", "x", "1"], palette=dict(DBSCAN='#1f77b4', KMeans='#e1802c', Birch='#3a913a'))
+    plt.grid(linestyle=':', zorder=1)
+    plt.legend(loc='upper right')
+    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_scatter_number_of_clusters_{}.eps".format(key)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+
+    plt.figure()
+    sns.lmplot(x='index', y="Mean Number of Samples per Clusters", data=data.reset_index(), fit_reg=False, hue='Algorithm', legend=False, markers=["o", "x", "1"], palette=dict(DBSCAN='#1f77b4', KMeans='#e1802c', Birch='#3a913a'))
+    plt.grid(linestyle=':', zorder=1)
+    plt.legend(loc='upper right')
+    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_scatter_number_of_samples_{}.eps".format(key)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
 
 
 def get_barchart(cluster_data, path, z=1.96):
@@ -185,10 +192,10 @@ def get_barchart(cluster_data, path, z=1.96):
             color = '#1f77b4'
         elif key is 'KMeans':
             position = bar_position_center
-            color = '#db6269'
+            color = '#e1802c'
         else:
             position = bar_position_right
-            color = '#ecab00'
+            color = '#3a913a'
 
         # Clusters
         plt.figure(1)
@@ -200,7 +207,7 @@ def get_barchart(cluster_data, path, z=1.96):
         plt.figure(3)
         plt.bar(position, outliers_bar, yerr=error_outliers, capsize=7, width=0.5, zorder=10, label=key, color=color)
 
-    for id_ in range(1,4):
+    for id_ in range(1, 4):
         if id_ is 1:
             ylabel = 'Mean Number of Clusters'
             filename = 'mean_number_of_clusters'

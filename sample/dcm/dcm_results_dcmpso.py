@@ -14,7 +14,7 @@ for key in traffic_level:
     for population in population_size:
         csv_filename = 'mean_evolution_{}_pop_{}_DCMPSO.csv'.format(key, population)
         try:
-            mean_data = consolidate_results("/Users/hugo/Desktop/PyCRE/csv/", csv_filename)
+            mean_data = consolidate_results("/Users/hugo/Desktop/PyCRE/dcm/csv/", csv_filename)
         except FileNotFoundError:
             mean_data = []
         finally:
