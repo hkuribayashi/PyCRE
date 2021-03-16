@@ -21,18 +21,26 @@ class HetNet:
         self.evaluation = dict(satisfaction=0.0, total_ue=0.0)
         self.ueQueue = SimpleQueue(env)
 
-    def populate_bs(self):
+    def populate_bs(self, number_bs):
         p0 = Point(0.0, 0.0, 35.0)
         mbs = BS(0, 'MBS', p0)
         self.add_bs(mbs)
 
+        if number_bs == 200:
+            step = 80
+        elif number_bs == 400:
+            step = 40
+        else:
+            step = 20
+
         counter = 1
-        for x in range(-500, 600, 100):
-            for y in range(-500, 600, 100):
-                if x != 0  and y != 0:
+        for y in range(-400, 440, 80):
+            for x in range(-400, 420, step):
+                if y != 0 and x != 0:
                     sbs_point = Point(x, y, 10.0)
                     sbs = BS(counter, 'SBS', sbs_point)
                     self.add_bs(sbs)
+                    counter += 1
 
     def add_bs(self, bs):
         if bs.type == 'MBS':
@@ -145,8 +153,7 @@ class HetNet:
                 weighted_sum += self.env.priority_ues_weight
             else:
                 weighted_sum += self.env.ordinary_ues_weight
-        total_weights = self.ueQueue.total_priority_ues * self.env.priority_ues_weight + \
-                        self.ueQueue.total_ordinary_ues * self.env.ordinary_ues_weight
+        total_weights = self.ueQueue.total_priority_ues * self.env.priority_ues_weight + self.ueQueue.total_ordinary_ues * self.env.ordinary_ues_weight
         self.evaluation['satisfaction'] = (weighted_sum / total_weights) * 100
         self.evaluation['total_ue'] = len(self.ue_list)
         self.evaluation['total_priority_ues'] = self.ueQueue.total_priority_ues
