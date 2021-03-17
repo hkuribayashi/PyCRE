@@ -32,7 +32,7 @@ while counter < n_hetnets:
     # Run the HetNet
     h.run(user_density)
 
-    filename = "{}hetnet_{}_{}.obj".format(path, n_bs, counter)
+    filename = "{}hetnet_{}_{}_{}.obj".format(path, user_density, n_bs, counter)
     file = open(filename, 'wb')
 
     pickle.dump(h, file)

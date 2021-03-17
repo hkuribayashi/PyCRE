@@ -28,7 +28,7 @@ print("Number of BSs: {}".format(n_bs))
 counter = 0
 cluster_list = []
 
-for id_ in range(0, 99):
+for id_ in range(0, 100):
     print("Current number of clusters found: {}".format(counter))
     print("Loading Hetnet {}:".format(id_))
 
