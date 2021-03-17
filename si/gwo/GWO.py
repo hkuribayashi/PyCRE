@@ -81,6 +81,7 @@ class GWO:
 
             for p in self.population:
                 p.update_position(self.alpha, self.beta, self.delta, self.a[counter])
+                p.adjust_position()
 
             # Get global mean evaluation
             evaluation = self.evaluate()

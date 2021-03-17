@@ -12,10 +12,25 @@ class Wolf:
     def evaluate(self, pareto_weight, bs_list):
         n_bs = len([componente for componente in self.solution if componente >= 0.5])
         n_rb = 0
+        total_rb = 0
         for id_, bs in enumerate(bs_list):
-            if self.solution[id_] > 0.5:
+            if self.solution[id_] >= 0.5:
                 n_rb += bs.resouce_blocks if bs.load == 0 else bs.resouce_blocks/bs.load
-        self.evaluation = pareto_weight * n_rb + (-1) * (1 - pareto_weight) * n_bs
+            total_rb += bs.resouce_blocks if bs.load == 0 else bs.resouce_blocks / bs.load
+        self.evaluation = pareto_weight * (n_rb/total_rb) + (-1) * (1 - pareto_weight) * (n_bs/len(bs_list))
+
+    def __validate_position(self):
+        flag = True
+        for id_, solution in enumerate(self.solution):
+            if solution >= 0.5:
+                flag = False
+                break
+        return flag
+
+    def adjust_position(self):
+        if self.__validate_position():
+            max_position = self.solution.index(max(self.solution))
+            self.solution[max_position] = 0.5
 
     def update_position(self, alpha, beta, delta, a):
         for idx, componente in enumerate(self.solution):

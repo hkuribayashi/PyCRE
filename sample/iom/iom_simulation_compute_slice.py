@@ -1,32 +1,36 @@
+import sys
 import pickle
 
-from clustering.ClusteringMethod import ClusteringMethod
-from clustering.DCM import DCM
-from clustering.PSOAlgorithm import PSOAlgorithm
 from infrastructure.GWOAlgorithm import GWOAlgorithm
 from infrastructure.IOM import IOM
 
-filename = "/Users/hugo/Desktop/PyCRE/iom/data/cluster_list_300.obj"
+# Get user density
+user_density = int(sys.argv[1])
 
+# Get number of BSs
+n_bs = int(sys.argv[2])
+
+# Path to save cvs files
+path = sys.argv[3]
+
+# Load cluster list object
+filename = "/Users/hugo/Desktop/PyCRE/iom/data/cluster_list_{}_{}.obj".format(user_density, n_bs)
 filehandler = open(filename, 'rb')
 cluster_list = pickle.load(filehandler)
 
-for target_cluster in cluster_list:
+for id_, target_cluster in enumerate(cluster_list):
 
     # Cluster
     print(target_cluster)
 
     # Instantiate IO Module with MOGWO Algorithm
-    # iom = IOM(target_cluster, path="/Users/hugo/Desktop/PyCRE/iom/csv/")
+    iom = IOM(target_cluster, path=path)
 
-    # Compute the network slice
-    # iom.compute_network_slice(GWOAlgorithm.MOGWO)
+    # Compute the network slice using MOGWO approach
+    gwo_slice = iom.compute_network_slice(id_, user_density, GWOAlgorithm.GWO)
 
-    # Instantiate IO Module with GWO Algorithm
-    # iom = IOM(target_cluster, GWOAlgorithm.GWO)
-
-    # Compute the network slice
-    # iom.compute_network_slice(GWOAlgorithm.MOGWO)
-
-    # Start the RLM for each network slice
-    # print(target_cluster.networkslice)
+    # Save GWO Slice
+    filename = "/Users/hugo/Desktop/PyCRE/iom/data/slice_{}_{}_{}.obj".format(user_density, n_bs, id_)
+    file = open(filename, 'wb')
+    pickle.dump(gwo_slice, file)
+    file.close()

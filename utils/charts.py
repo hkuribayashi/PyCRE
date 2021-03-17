@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from pandas import DataFrame
 import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 
 from config.network import Network
 
@@ -51,7 +53,11 @@ def get_visual(hetnet):
 
 def get_evaluation_evolution(data, filename, marker='', xlim=None):
     for key in data:
-        plt.plot(data[key][5:149], marker, label=key, markersize=2.2)
+        df = data[key][0:300].to_frame()
+        df.columns = ['Mean']
+        min_max_scaler = StandardScaler()
+        data_ = min_max_scaler.fit_transform(df[['Mean']])
+        plt.plot(data[key][0:300], marker, label=key, markersize=2.2)
 
     plt.xlabel('Iterations')
     plt.ylabel('Objective Function')
@@ -60,8 +66,7 @@ def get_evaluation_evolution(data, filename, marker='', xlim=None):
     if xlim is not None:
         plt.xlim(xlim)
 
-    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", filename), dpi=Network.DEFAULT.image_resolution,
-                bbox_inches='tight')
+    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/iom/images/", filename), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
     plt.close()
 
 

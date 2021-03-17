@@ -19,21 +19,20 @@ min_cluster_size = int(sys.argv[3])
 max_cluster_size = int(sys.argv[4])
 
 # Path
-path = sys.argv[4]
+path = sys.argv[5]
 
 # Debug
 print("User Density: {} UEs/km2".format(user_density))
 print("Number of BSs: {}".format(n_bs))
 
-counter = 0
 cluster_list = []
 
 for id_ in range(0, 100):
-    print("Current number of clusters found: {}".format(counter))
+    print("Current number of clusters found: {}".format(len(cluster_list)))
     print("Loading Hetnet {}:".format(id_))
 
     # Load hetnet
-    filename = '/Users/hugo/Desktop/PyCRE/iom/data/hetnet_{}_{}.obj'.format(n_bs, id_)
+    filename = '/Users/hugo/Desktop/PyCRE/iom/data/hetnet_{}_{}_{}.obj'.format(user_density, n_bs, id_)
     filehandler = open(filename, 'rb')
     hetnet = pickle.load(filehandler)
 
@@ -45,7 +44,7 @@ for id_ in range(0, 100):
         if min_cluster_size < len(target_cluster.ue_list) < max_cluster_size:
             cluster_list.append(target_cluster)
 
-filename = "{}cluster_list_{}.obj".format(path, user_density)
+filename = "{}cluster_list_{}_{}.obj".format(path, user_density, n_bs)
 file = open(filename, 'wb')
 
 pickle.dump(cluster_list, file)
