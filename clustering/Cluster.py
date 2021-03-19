@@ -14,7 +14,7 @@ class Cluster:
         self.outage_threshold = outage_threshold
         self.network_slice = None
 
-    def evaluate(self):
+    def evaluate(self, flag=True):
         fulfilled_qos_ues = np.array([ue for ue in self.ue_list if ue.evaluation is True])
         weighted_sum = 0
         for ue in fulfilled_qos_ues:
@@ -28,7 +28,9 @@ class Cluster:
                     total_ues - total_priority_ues) * self.ordinary_ues_weight
 
         evaluation = weighted_sum / total_weights
-        if evaluation < self.outage_threshold:
+        if flag and evaluation < self.outage_threshold:
+            self.target_cluster = True
+        else:
             self.target_cluster = True
 
         self.evaluation['satisfaction'] = evaluation * 100

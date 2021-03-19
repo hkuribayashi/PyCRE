@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import itertools
 from collections import Counter
@@ -36,10 +38,10 @@ class DCM:
             self.data.append([ue.point.x, ue.point.y])
         self.data = np.array(self.data)
 
-    def compute_clusters(self, population_size=150, max_steps=150):
+    def compute_clusters(self, population_size=150, max_steps=150, flag=True):
         self.__get_optimized_cluster(population_size, max_steps)
         self.__get_target_clusters()
-        self.__get_evaluation_per_cluster()
+        self.__get_evaluation_per_cluster(flag)
         self.__compute_bs_per_cluster()
 
     def __get_optimized_cluster(self, population_size, max_steps):
@@ -74,9 +76,9 @@ class DCM:
                     new_cluster.ue_list.append(self.ue_list[idx])
             self.clusters.append(new_cluster)
 
-    def __get_evaluation_per_cluster(self):
+    def __get_evaluation_per_cluster(self, flag=True):
         for cluster in self.clusters:
-            cluster.evaluate()
+            cluster.evaluate(flag)
         self.clusters = [cluster for cluster in self.clusters if cluster.target_cluster is True]
 
     def __compute_bs_per_cluster(self):
@@ -89,6 +91,7 @@ class DCM:
             cluster.bs_list = bs_set
 
         # Compute difference between the BS sets
+        self.clusters.sort(key=lambda x: x.evaluation['total_priority_ues'], reverse=True)
         for a, b in itertools.combinations(self.clusters, 2):
             a.bs_list = a.bs_list.difference(b.bs_list)
             b.bs_list = b.bs_list.difference(a.bs_list)
@@ -96,6 +99,14 @@ class DCM:
         # Debug
         for cluster in self.clusters:
             cluster.bs_list = list(sorted(cluster.bs_list))
+
+    def remove_bs(self, closest_bs, cluster_id):
+        for cluster in self.clusters:
+            if cluster.id != cluster_id and closest_bs in cluster.bs_list:
+                if isinstance(cluster.bs_list, list) :
+                    cluster.bs_list.remove(closest_bs)
+                elif isinstance(cluster.bs_list, set):
+                    cluster.bs_list.remove(closest_bs)
 
     def optimization_engine(self, population_size, max_steps=20):
         if self.pso_algorithm is PSOAlgorithm.DCMPSO:

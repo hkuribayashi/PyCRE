@@ -53,10 +53,6 @@ def get_visual(hetnet):
 
 def get_evaluation_evolution(data, filename, marker='', xlim=None):
     for key in data:
-        df = data[key][0:300].to_frame()
-        df.columns = ['Mean']
-        min_max_scaler = StandardScaler()
-        data_ = min_max_scaler.fit_transform(df[['Mean']])
         plt.plot(data[key][0:300], marker, label=key, markersize=2.2)
 
     plt.xlabel('Iterations')
