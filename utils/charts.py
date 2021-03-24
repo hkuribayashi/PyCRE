@@ -272,3 +272,18 @@ def get_bar_chart(mean_n_bs, mean_load_per_weight, path, filename):
     plt.grid(linestyle=':', zorder=1)
     plt.legend()
     plt.savefig('{}{}'.format(path, "{}.eps".format(filename)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+
+
+def get_pareto_frontier(gwo_evaluation_f1, gwo_evaluation_f2, mogwo_evaluation, path, filename):
+    plt.rc('text', usetex=True)
+    mpl.rcParams['mathtext.fontset'] = 'cm'
+    mpl.rcParams['mathtext.rm'] = 'serif'
+
+    plt.plot(gwo_evaluation_f1, gwo_evaluation_f2, zorder=10, label="GWO")
+    plt.plot('x', 'y', data=mogwo_evaluation, linestyle='', marker='o', color="red", zorder=10, label="MOGWO")
+
+    plt.grid(linestyle=':', zorder=1)
+    plt.xlabel("Objective Function $f_1$")
+    plt.ylabel("Objective Function $f_2$")
+    plt.legend()
+    plt.savefig('{}{}'.format(path, "{}.eps".format(filename)), dpi=Network.DEFAULT.image_resolution)

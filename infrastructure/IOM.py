@@ -39,7 +39,7 @@ class IOM:
 
         return global_evolution, alpha_evolution
 
-    def compute_network_slice(self, id_, user_density, optimization_strategy, pop_size=400, max_steps=300, segments=15, simulations=5, satisfaction_level=75):
+    def compute_network_slice(self, id_, user_density, optimization_strategy, pop_size=400, max_steps=300, segments=20, simulations=5, satisfaction_level=75):
         global result
         if len(self.cluster.bs_list) == 1:
             result = Slice(self.cluster, None)

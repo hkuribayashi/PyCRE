@@ -27,16 +27,17 @@ target_cluster_list = pickle.load(filehandler)
 selected_cluster_list = []
 
 # Remove clusters with no BSs
+# 300: 15 - 25
 print("Cluster List Size: {}".format(len(target_cluster_list)))
 for cluster in target_cluster_list:
-    if 15 < len(cluster.ue_list) < 35 and len(cluster.bs_list) > 1:
+    if 15 < len(cluster.ue_list) < 25 and len(cluster.bs_list) > 1:
         selected_cluster_list.append(cluster)
 
 slice_list = []
 
 # Compute a network slice for each target cluster
 print("Updated Cluster List Size: {}".format(len(selected_cluster_list)))
-for id_ in range(0, 153):
+for id_ in range(0, 62):
 
     # New Cluster ID
     print("Cluster {}".format(id_))

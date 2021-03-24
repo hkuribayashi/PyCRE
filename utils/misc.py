@@ -174,6 +174,7 @@ def get_int(k_number, data_size):
         result += 1
     return result
 
+
 def get_int_2(branching_factor):
 
     if branching_factor < 10:
@@ -183,3 +184,18 @@ def get_int_2(branching_factor):
     else:
         result = int(branching_factor)
     return result
+
+
+def get_pareto_evaluation(slice, solution):
+    bs_list = slice.cluster.bs_list
+    n_bs = len([componente for componente in solution if componente >= 0.5])
+    n_rb = 0
+    total_rb = 0
+    for id_, bs in enumerate(bs_list):
+        if solution[id_] > 0.5:
+            n_rb += bs.resouce_blocks if bs.load == 0 else bs.resouce_blocks/bs.load
+        total_rb += bs.resouce_blocks if bs.load == 0 else bs.resouce_blocks / bs.load
+    f1 =  (n_rb/total_rb)
+    f2 = (-1) * n_bs/len(bs_list)
+
+    return f1, f2
