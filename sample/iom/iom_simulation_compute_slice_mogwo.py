@@ -29,14 +29,14 @@ selected_cluster_list = []
 # Remove clusters with no BSs
 print("Cluster List Size: {}".format(len(target_cluster_list)))
 for cluster in target_cluster_list:
-    if 15 < len(cluster.ue_list) < 45 and len(cluster.bs_list) > 1:
+    if 15 < len(cluster.ue_list) < 35 and len(cluster.bs_list) > 1:
         selected_cluster_list.append(cluster)
 
 slice_list = []
 
 # Compute a network slice for each target cluster
 print("Updated Cluster List Size: {}".format(len(selected_cluster_list)))
-for id_ in range(0, len(selected_cluster_list)):
+for id_ in range(0, 153):
 
     # New Cluster ID
     print("Cluster {}".format(id_))
@@ -47,13 +47,13 @@ for id_ in range(0, len(selected_cluster_list)):
     iom = IOM(cluster, path=path)
 
     # Compute the network slice using MOGWO approach
-    gwo_slice = iom.compute_network_slice(id_, user_density, GWOAlgorithm.GWO, satisfaction_level=satisfaction_level, pop_size=pop_size)
+    gwo_slice = iom.compute_network_slice(id_, user_density, GWOAlgorithm.MOGWO, satisfaction_level=satisfaction_level, pop_size=pop_size)
 
     # Save the network slice
     slice_list.append(gwo_slice)
 
 # Save the slice list
-filename = "/Users/hugo/Desktop/PyCRE/iom/data/slice_list_{}_{}_{}_pop_{}.obj".format(user_density, n_bs, satisfaction_level, pop_size)
+filename = "/Users/hugo/Desktop/PyCRE/iom/data/slice_list_{}_{}_{}_pop_{}_mogwo.obj".format(user_density, n_bs, satisfaction_level, pop_size)
 file = open(filename, 'wb')
 pickle.dump(slice_list, file)
 file.close()

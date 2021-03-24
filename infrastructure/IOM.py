@@ -33,16 +33,13 @@ class IOM:
                     self.best_solution[pareto_weight] = gwo.alpha.solution.copy()
                 counter += 1
         elif optimization_strategy is GWOAlgorithm.MOGWO:
-            counter = 0
-            while counter < simulations:
-                mogwo = MOGWO(self.cluster, max_steps, population_size, segments)
-                mogwo.search()
-                global_evolution.append(mogwo.archive)
-                counter += 1
+            mogwo = MOGWO(self.cluster, max_steps, population_size, segments)
+            mogwo.search()
+            global_evolution.append(mogwo.archive)
 
         return global_evolution, alpha_evolution
 
-    def compute_network_slice(self, id_, user_density, optimization_strategy, pop_size=200, max_steps=300, segments=10, simulations=5):
+    def compute_network_slice(self, id_, user_density, optimization_strategy, pop_size=400, max_steps=300, segments=15, simulations=5, satisfaction_level=75):
         global result
         if len(self.cluster.bs_list) == 1:
             result = Slice(self.cluster, None)
@@ -50,13 +47,13 @@ class IOM:
             for weight in reversed(range(1, 10)):
                 weight = weight/10
                 global_evolution, alpha_evolution = self.__optimization_engine(optimization_strategy, pop_size, max_steps, segments, simulations, weight)
-                save_to_csv(global_evolution, self.path, "iom_{}_cluster_mean_evolution_{}_pop_{}_GWO_{}.csv".format(user_density,weight, pop_size, id_))
-                save_to_csv(alpha_evolution, self.path, "iom_{}_cluster_mean_evolution_{}_pop_{}_GWO_alpha-{}.csv".format(user_density, weight, pop_size, id_))
+                save_to_csv(global_evolution, self.path, "iom_{}_cluster_mean_evolution_{}_{}_GWO_{}_pop_{}.csv".format(user_density, weight, satisfaction_level, id_, pop_size))
+                save_to_csv(alpha_evolution, self.path, "iom_{}_cluster_mean_evolution_{}_{}_GWO_alpha_{}_pop_{}.csv".format(user_density, weight, satisfaction_level, id_, pop_size))
             result = Slice(self.cluster, self.best_solution)
         elif optimization_strategy is GWOAlgorithm.MOGWO:
             global_evolution, _ = self.__optimization_engine(optimization_strategy, pop_size, max_steps, segments, simulations)
             flatten_list = list(chain.from_iterable(global_evolution))
             flatten_list = list(chain.from_iterable(flatten_list))
-            get_visual_pareto(flatten_list)
+            # get_visual_pareto(flatten_list)
             result = Slice(self.cluster, flatten_list)
         return result

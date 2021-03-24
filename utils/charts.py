@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from pandas import DataFrame
 import seaborn as sns
+import matplotlib as mpl
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import StandardScaler
 
@@ -10,7 +11,6 @@ from config.network import Network
 
 
 def get_visual(hetnet):
-
     # Legend
     legend_elements = [Line2D([0], [0], marker='o', color='w', label='MBS', markerfacecolor='b', markersize=10),
                        Line2D([0], [0], marker='o', color='w', label='SBS', markerfacecolor='g', markersize=10),
@@ -51,18 +51,32 @@ def get_visual(hetnet):
     plt.show()
 
 
-def get_evaluation_evolution(data, filename, marker='', xlim=None):
+def get_evaluation_evolution(data, filename, marker='', xlim=None, ylim=None, alpha=False):
+    plt.rc('text', usetex=True)
+    mpl.rcParams['mathtext.fontset'] = 'cm'
+    mpl.rcParams['mathtext.rm'] = 'serif'
+
     for key in data:
-        plt.plot(data[key][0:300], marker, label=key, markersize=2.2)
+        if alpha:
+            plt.plot(data[key][0:100], marker, label=key, markersize=2.2)
+        else:
+            plt.plot(data[key][0:300], marker, label=key, markersize=2.2)
 
     plt.xlabel('Iterations')
     plt.ylabel('Objective Function')
     plt.grid(linestyle=':')
-    plt.legend(loc='best')
+
+    if alpha:
+        plt.legend(loc='lower right')
+    else:
+        plt.legend(loc='upper left')
+
     if xlim is not None:
         plt.xlim(xlim)
+    if ylim is not None:
+        plt.ylim(ylim)
 
-    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/iom/images/", filename), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/iom/images/", filename), dpi=Network.DEFAULT.image_resolution)
     plt.close()
 
 
@@ -115,30 +129,39 @@ def get_visual_pareto(data):
 def get_violinchart(data, key):
     sns.violinplot(x=data["Algorithm"], y=data["Mean Number of Clusters"])
     plt.grid(linestyle=':', zorder=1)
-    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_violin_number_of_clusters_{}.eps".format(key)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+    plt.savefig(
+        '{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_violin_number_of_clusters_{}.eps".format(key)),
+        dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
 
     plt.figure()
     sns.violinplot(x=data["Algorithm"], y=data["Mean Number of Samples per Clusters"])
     plt.grid(linestyle=':', zorder=1)
-    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_violin_number_of_samples_{}.eps".format(key)),
-                dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+    plt.savefig(
+        '{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_violin_number_of_samples_{}.eps".format(key)),
+        dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
 
 
 def get_scatterplot(data, key):
-    sns.lmplot(x='index', y="Mean Number of Clusters", data=data.reset_index(), fit_reg=False, hue='Algorithm', legend=False, markers=["o", "x", "1"], palette=dict(DBSCAN='#1f77b4', KMeans='#e1802c', Birch='#3a913a'))
+    sns.lmplot(x='index', y="Mean Number of Clusters", data=data.reset_index(), fit_reg=False, hue='Algorithm',
+               legend=False, markers=["o", "x", "1"], palette=dict(DBSCAN='#1f77b4', KMeans='#e1802c', Birch='#3a913a'))
     plt.grid(linestyle=':', zorder=1)
     plt.legend(loc='upper right')
-    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_scatter_number_of_clusters_{}.eps".format(key)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+    plt.savefig(
+        '{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_scatter_number_of_clusters_{}.eps".format(key)),
+        dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
 
     plt.figure()
-    sns.lmplot(x='index', y="Mean Number of Samples per Clusters", data=data.reset_index(), fit_reg=False, hue='Algorithm', legend=False, markers=["o", "x", "1"], palette=dict(DBSCAN='#1f77b4', KMeans='#e1802c', Birch='#3a913a'))
+    sns.lmplot(x='index', y="Mean Number of Samples per Clusters", data=data.reset_index(), fit_reg=False,
+               hue='Algorithm', legend=False, markers=["o", "x", "1"],
+               palette=dict(DBSCAN='#1f77b4', KMeans='#e1802c', Birch='#3a913a'))
     plt.grid(linestyle=':', zorder=1)
     plt.legend(loc='upper right')
-    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_scatter_number_of_samples_{}.eps".format(key)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+    plt.savefig(
+        '{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_scatter_number_of_samples_{}.eps".format(key)),
+        dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
 
 
 def get_barchart(cluster_data, path, z=1.96):
-
     # Bar position
     bar_position_left = [0, 3.0, 6.0]
     bar_position_center = [0.6, 3.6, 6.6]
@@ -167,7 +190,7 @@ def get_barchart(cluster_data, path, z=1.96):
 
             # Compute SE and CI
             # Number of Clusters
-            se_clusters = std['Number of Clusters']/np.sqrt(len(d_))
+            se_clusters = std['Number of Clusters'] / np.sqrt(len(d_))
             lcb_clusters = mean['Number of Clusters'] - z * se_clusters
             ucb_clusters = mean['Number of Clusters'] + z * se_clusters
             error_cluster.append([lcb_clusters, ucb_clusters])
@@ -226,3 +249,26 @@ def get_barchart(cluster_data, path, z=1.96):
         plt.grid(linestyle=':', zorder=1)
         plt.legend(loc='best')
         plt.savefig('{}{}'.format(path, "{}.eps".format(filename)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+
+
+def get_bar_chart(mean_n_bs, mean_load_per_weight, path, filename):
+    bar_width = 0.4
+
+    m_n_bs = [mean_n_bs[0], mean_n_bs[3], mean_n_bs[8]]
+    m_l_bs = [mean_load_per_weight[0], mean_load_per_weight[3], mean_load_per_weight[8]]
+
+    r1 = np.arange(len(m_n_bs))
+    r2 = [x + bar_width + 0.02 for x in r1]
+    r3 = (r1 + r2)/2
+
+    plt.bar(r1, m_n_bs, width=bar_width, label="Percentage of Slices by Number of BSs", zorder=10)
+    plt.bar(r2, m_l_bs, width=bar_width, label="Slice Load Average", zorder=10)
+
+    plt.xlabel('Pareto Weight')
+    plt.ylabel('%')
+    plt.xticks(r3, ['0.9', '0.5', '0.1'])
+
+    # Create legend & Show graphic
+    plt.grid(linestyle=':', zorder=1)
+    plt.legend()
+    plt.savefig('{}{}'.format(path, "{}.eps".format(filename)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')

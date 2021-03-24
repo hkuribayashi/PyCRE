@@ -17,6 +17,8 @@ class Wolf:
             if self.solution[id_] >= 0.5:
                 n_rb += bs.resouce_blocks if bs.load == 0 else bs.resouce_blocks/bs.load
             total_rb += bs.resouce_blocks if bs.load == 0 else bs.resouce_blocks / bs.load
+        if len(bs_list) == 0:
+            print("================>")
         self.evaluation = pareto_weight * (n_rb/total_rb) + (-1) * (1 - pareto_weight) * (n_bs/len(bs_list))
 
     def __validate_position(self):

@@ -24,12 +24,15 @@ class MOGWOWolf:
         return self.idx
 
     def evaluate(self, bs_list):
+        n_bs = len([componente for componente in self.solution if componente >= 0.5])
         n_rb = 0
+        total_rb = 0
         for id_, bs in enumerate(bs_list):
             if self.solution[id_] > 0.5:
                 n_rb += bs.resouce_blocks if bs.load == 0 else bs.resouce_blocks/bs.load
-        self.evaluation_f1 = (-1) * n_rb
-        self.evaluation_f2 = len([componente for componente in self.solution if componente >= 0.5])
+            total_rb += bs.resouce_blocks if bs.load == 0 else bs.resouce_blocks / bs.load
+        self.evaluation_f1 = (-1) * (n_rb/total_rb)
+        self.evaluation_f2 = n_bs/len(bs_list)
 
     def update_position(self, alpha, beta, delta, a):
         for idx, componente in enumerate(self.solution):

@@ -27,6 +27,12 @@ class MOGWOSegment:
         else:
             return True
 
+    def is_full(self):
+        if len(self.archive ) == self.archive_max:
+            return True
+        else:
+            return False
+
     def __str__(self):
         str_return = ""
         for p in self.archive:

@@ -33,9 +33,12 @@ class MOGWOSegmentController:
     def update(self, non_dominated_list):
         for p in non_dominated_list:
             flag = True
-            while flag:
-                key = random.randint(0, self.n_segments - 1)
-                flag = self.segments[key].add_solution(p)
+            if not self.is_full():
+                while flag:
+                    key = random.randint(0, self.n_segments - 1)
+                    flag = self.segments[key].add_solution(p)
+                return True
+            return False
 
     def get_archive_size(self):
         archive_size = 0
@@ -48,3 +51,10 @@ class MOGWOSegmentController:
         for key in self.segments:
             archived_solutions.append(self.segments[key].archive)
         return archived_solutions
+
+    def is_full(self):
+        flag = True
+        for key in self.segments:
+            if not self.segments[key].is_full():
+                flag = False
+        return flag

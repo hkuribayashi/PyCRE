@@ -79,7 +79,7 @@ class DCM:
     def __get_evaluation_per_cluster(self, flag=True):
         for cluster in self.clusters:
             cluster.evaluate(flag)
-        self.clusters = [cluster for cluster in self.clusters if cluster.target_cluster is True]
+        self.clusters = [cluster for cluster in self.clusters if cluster.cluster is True]
 
     def __compute_bs_per_cluster(self):
         # Compute the closest BSs per cluster
