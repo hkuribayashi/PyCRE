@@ -13,7 +13,7 @@ class BS:
 
     def increase_bias(self, bias):
         for coluna in map(list, zip(*self.hetnet.network_element)):
-            if coluna[0].bs.id_ == self.id:
+            if coluna[0].bs.id == self.id:
                 # print('Increasing Bias')
                 for ne in coluna:
                     # print('SINR: {}'.format(ne.sinr))
@@ -28,7 +28,7 @@ class BS:
 
     def decrease_bias(self, bias):
         for coluna in map(list, zip(*self.hetnet.network_element)):
-            if coluna[0].bs.id_ == self.id:
+            if coluna[0].bs.id == self.id:
                 # print('Decreasing Bias')
                 for ne in coluna:
                     # print('SINR: {}'.format(ne.sinr))

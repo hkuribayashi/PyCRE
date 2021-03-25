@@ -3,7 +3,7 @@ from enum import Enum
 
 class Agent(Enum):
 
-    DEFAULT = (1000, 1000, 0.1, 0.99, 1, 0.01, 0.01, 200, True)
+    DEFAULT = (100, 100, 0.1, 0.99, 1, 0.01, 0.01, 20, True)
 
     def __init__(self, episodes, max_steps_per_episode, learning_rate, discount_rate, max_exploration_rate,
                  min_exploration_rate, exploration_decay_rate, max_iter_per_state, verbose):

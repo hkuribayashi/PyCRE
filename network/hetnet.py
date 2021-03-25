@@ -62,16 +62,19 @@ class HetNet:
                 linha_network_element.append(NetworkElement(ue, bs))
             self.network_element.append(linha_network_element)
 
-    def run(self, user_density):
-        # Add UEs
-        self.ue_list = self.ueQueue.populate_ues(user_density)
+    def run(self, user_density=300, first_run_flag=True):
+        if first_run_flag:
+            # Add UEs
+            self.ue_list = self.ueQueue.populate_ues(user_density)
 
         if len(self.ue_list) > 0 and len(self.list_bs) > 0:
-            # Constructs the NetworkElement structure
-            self.__get_ne()
 
-            # Compute SINR
-            self.__get_sinr()
+            if first_run_flag:
+                # Constructs the NetworkElement structure
+                self.__get_ne()
+
+                # Compute SINR
+                self.__get_sinr()
 
             # Compute UE x BS Association
             self.__get_association()
@@ -83,7 +86,8 @@ class HetNet:
             self.__get_ue_datarate()
 
             # Compute Performance Evaluation
-            self.__get_metrics()
+            if first_run_flag:
+                self.__get_metrics()
 
     def reset(self):
         self.network_element = list()
