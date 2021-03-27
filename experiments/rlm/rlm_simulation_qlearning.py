@@ -1,10 +1,11 @@
 import sys
 import pickle
-import numpy as np
 
-from config.qlearning import Agent
-from rl.qlearning.env import Environment
-from rl.qlearning.agent import SingleAgent
+from config.QLConfig import QLConfig
+from algorithms.rl.qlearning.Environment import Environment
+from algorithms.rl.qlearning.QLSingleAgent import QLSigleAgent
+from modules.rlm.RLM import RLM
+from modules.rlm.ReinforcementLearningMethod import ReinforcementLearningMethod
 from utils.misc import save_to_csv
 
 
@@ -14,11 +15,8 @@ user_density = int(sys.argv[1])
 # Get number of BSs
 n_bs = int(sys.argv[2])
 
-# Get the number of repetitions
-n_repetitions = int(sys.argv[3])
-
 # Get the path to save results
-path = sys.argv[4]
+path = sys.argv[3]
 
 global filehandler
 
@@ -34,7 +32,7 @@ except IOError:
     slice_list = pickle.load(filehandler)
 
     # Saving the biggest slice for testing pourposes
-    slice_list.sort(key=lambda x: len(x.cluster.bs_list), reverse=True)
+    # slice_list.sort(key=lambda x: len(x.cluster.bs_list), reverse=True)
     for slice_ in slice_list:
         slice_.compute_selected_bs()
 
@@ -46,31 +44,27 @@ finally:
     filehandler.close()
 
 # Setting reinforcement Learning configs
-config = Agent.DEFAULT
+config = QLConfig.DEFAULT
 config.verbose = False
 
 # Mean Evaluation for all Slices
-# 101: Number of episodes + The Inicial Cluster Evaluation
-mean_evaluation = np.zeros(101)
+# 101: Number of episodes + the inicial cluster evaluation
+mean_satisfaction = []
+
+size = len(slice_list)
+range_ = size if size < 50 else 50
 
 # Debug
-print("Starting RLM with {} UEs/km2 and {} BSs/km2".format(user_density, n_bs))
-print("Analysing {} network slices".format(len(slice_list)))
+print("Starting RLM (Q-Learning) with {} UEs/km2 and {} BSs/km2".format(user_density, n_bs))
+print("Analysing {} network slices".format(size))
 
-# For each slice invoke Q-learning Engine
-# Repetitions: Run 'n_repetitions' times each slice
-
-for id_, slice_ in enumerate(slice_list):
+for id_ in range(size):
+    slice_ = slice_list[id_]
     print("Slice Index {}".format(id_))
-    counter = 0
-    while counter < n_repetitions:
-        env = Environment(slice_)
-        sigle_agent = SingleAgent(env, Agent.DEFAULT)
-        sigle_agent.run()
-        mean_evaluation += np.array(sigle_agent.satisfaction_all_episodes)
-        print(sigle_agent.satisfaction_all_episodes)
-        counter += 1
+    rlm = RLM(rl_method=ReinforcementLearningMethod.QLEARNING, network_slice=slice_, config=config)
+    rlm.run()
+    mean_satisfaction.append(rlm.evaluation["satisfaction"])
+    print(rlm.evaluation["satisfaction"])
 
 # Compute mean and save results
-mean_evaluation = mean_evaluation/len(slice_list)
-save_to_csv(mean_evaluation, path, "rlm_qlearning_{}_{}.csv".format(user_density, n_bs))
+save_to_csv(list(mean_satisfaction), path, "rlm_qlearning_{}_{}.csv".format(user_density, n_bs))

@@ -1,8 +1,8 @@
 import sys
 
-from clustering.PSOAlgorithm import PSOAlgorithm
-from clustering.DCM import DCM
-from clustering.ClusteringMethod import ClusteringMethod
+from modules.dcm.PSOAlgorithm import PSOAlgorithm
+from modules.dcm.DCM import DCM
+from modules.dcm.ClusteringMethod import ClusteringMethod
 from config.network import Network
 from mobility.point import Point
 from network.bs import BS

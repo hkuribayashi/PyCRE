@@ -1,9 +1,9 @@
 import pickle
 import sys
 
-from clustering.PSOAlgorithm import PSOAlgorithm
-from clustering.DCM import DCM
-from clustering.ClusteringMethod import ClusteringMethod
+from modules.dcm.PSOAlgorithm import PSOAlgorithm
+from modules.dcm.DCM import DCM
+from modules.dcm.ClusteringMethod import ClusteringMethod
 
 # Get traffic level
 user_density = int(sys.argv[1])

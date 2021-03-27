@@ -6,7 +6,10 @@ import seaborn as sns
 import matplotlib as mpl
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import StandardScaler
+from stable_baselines3.common.monitor import load_results
+from stable_baselines3.common.results_plotter import ts2xy
 
+from config.DQNConfig import DQNConfig
 from config.network import Network
 
 
@@ -287,3 +290,56 @@ def get_pareto_frontier(gwo_evaluation_f1, gwo_evaluation_f2, mogwo_evaluation, 
     plt.ylabel("Objective Function $f_2$")
     plt.legend()
     plt.savefig('{}{}'.format(path, "{}.eps".format(filename)), dpi=Network.DEFAULT.image_resolution)
+
+
+def get_mean_evaluation_cluster(data, filename, marker=''):
+    for key in data:
+        plt.plot(data[key][0:100], marker, label=key, markersize=2.2)
+
+    plt.hlines(75.0, -5.0, 105, linestyles='dashed', colors="r", label="Threshold")
+
+    plt.xlabel('Episodes')
+    plt.ylabel('Mean Satisfaction per Cluster (%)')
+    plt.xlim(-5.0, 105.0)
+    plt.ylim(40.0, 102.0)
+    plt.grid(linestyle=':')
+
+    plt.legend(loc='upper left')
+
+    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/rlm/images/", filename), dpi=Network.DEFAULT.image_resolution)
+    plt.close()
+
+
+def moving_average(values, window):
+    """
+    Smooth values by doing a moving average
+    :param values: (numpy array)
+    :param window: (int)
+    :return: (numpy array)
+    """
+    weights = np.repeat(1.0, window) / window
+    return np.convolve(values, weights, 'valid')
+
+
+def plot_results(log_folder, title='Learning Curve'):
+    """
+    plot the results
+
+    :param log_folder: (str) the save location of the results to plot
+    :param title: (str) the title of the task to plot
+    """
+    teste = load_results(log_folder)
+    x, y = ts2xy(teste, 'timesteps')
+    y = moving_average(y, window=1000)
+    # Truncate x
+    x = x[len(x) - len(y):]
+
+    fig = plt.figure(title)
+    plt.plot(x, y)
+    plt.xlabel('Number of Timesteps')
+    plt.ylabel('Rewards')
+    plt.title(title + " Smoothed")
+    plt.show()
+
+
+# plot_results(DQNConfig.DEFAULT.log_dir, "AAA")

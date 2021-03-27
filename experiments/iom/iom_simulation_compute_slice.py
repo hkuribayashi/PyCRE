@@ -1,8 +1,8 @@
 import sys
 import pickle
 
-from infrastructure.GWOAlgorithm import GWOAlgorithm
-from infrastructure.IOM import IOM
+from modules.iom.GWOAlgorithm import GWOAlgorithm
+from modules.iom.IOM import IOM
 
 
 # Get user density

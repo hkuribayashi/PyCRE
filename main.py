@@ -1,12 +1,12 @@
 import random
 import numpy as np
 
-from clustering.ClusteringMethod import ClusteringMethod
-from clustering.DCM import DCM
-from clustering.PSOAlgorithm import PSOAlgorithm
+from modules.dcm.ClusteringMethod import ClusteringMethod
+from modules.dcm.DCM import DCM
+from modules.dcm.PSOAlgorithm import PSOAlgorithm
 from config.network import Network
-from infrastructure.GWOAlgorithm import GWOAlgorithm
-from infrastructure.IOM import IOM
+from modules.iom.GWOAlgorithm import GWOAlgorithm
+from modules.iom.IOM import IOM
 from mobility.point import Point
 from network.bs import BS
 from network.hetnet import HetNet
