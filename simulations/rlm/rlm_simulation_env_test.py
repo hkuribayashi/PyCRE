@@ -1,11 +1,7 @@
 import sys
-import copy
+import gym
 import pickle
-from stable_baselines3.common.monitor import Monitor
-
-from config.DQNConfig import DQNConfig
-from modules.rlm.RLM import RLM
-from modules.rlm.ReinforcementLearningMethod import ReinforcementLearningMethod
+from stable_baselines3.common.env_checker import check_env
 
 
 # Get user density
@@ -14,8 +10,6 @@ user_density = int(sys.argv[1])
 # Get number of BSs
 n_bs = int(sys.argv[2])
 
-# Get the path to save results
-path = sys.argv[3]
 
 global filehandler
 
@@ -42,29 +36,10 @@ except IOError:
 finally:
     filehandler.close()
 
-learning_rate = [0.5, 0.1, 0.01, 0.001, 0.0001]
+# Debug
+print("Starting RLM with {} UEs/km2 and {} BSs/km2".format(user_density, n_bs))
 
-original_monitor_value = copy.deepcopy(Monitor.EXT)
-
-for lr in learning_rate:
-    mean_satisfaction = []
-
-    config = DQNConfig.DEFAULT
-    config.learning_rate = lr
-
-    # Debug
-    print("Starting RLM (DQN) - LR {} with {} UEs/km2 and {} BSs/km2".format(lr, user_density, n_bs))
-
-    # Adjusting the Monitor Ext ID
-    Monitor.EXT = "{}_{}_{}_{}".format(user_density, lr, 0, original_monitor_value)
-
-    # Get the network slice
-    network_slice = slice_list[0]
-
-    full_id = "{}_{}_{}".format(user_density, lr, 0)
-
-    # Instantiate the RL Module
-    rlm = RLM(full_id, ReinforcementLearningMethod.DQN, network_slice, config)
-
-    # Start the trainning phase and monitor the results
-    rlm.learn()
+for id_ in range(5):
+    network_slice = slice_list[id_]
+    env = gym.make("gym_pycre:pycre-v0", network_slice=network_slice)
+    check_env(env)

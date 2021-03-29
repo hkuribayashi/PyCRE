@@ -3,7 +3,7 @@ from enum import Enum
 
 class DQNConfig(Enum):
 
-    DEFAULT = (10000, 0.99, 0.1, [32, 32], "/Users/hugo/Desktop/PyCRE/rlm/logs/", 0)
+    DEFAULT = (10000, 0.99, 0.1, [32, 32], "/Users/hugo/Desktop/PyCRE/rlm/logs/", 1)
 
     def __init__(self, total_timesteps, gamma, learning_rate, net_arch, log_dir, verbose):
 

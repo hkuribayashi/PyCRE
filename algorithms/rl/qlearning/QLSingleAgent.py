@@ -18,7 +18,7 @@ class QLSigleAgent:
 
         self.num_episodes = config.num_episodes
         self.max_steps_per_episode = config.max_steps_per_episode
-        self.learning_rate = config.learning_rate
+        self.learning_rate = config.learning_rate_list
         self.discount_rate = config.discount_rate
         self.max_exploration_rate = config.max_exploration_rate
         self.min_exploration_rate = config.min_exploration_rate

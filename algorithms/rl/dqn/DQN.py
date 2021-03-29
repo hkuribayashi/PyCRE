@@ -1,10 +1,11 @@
 import os
 import gym
-import copy
+from gym.wrappers import TimeLimit
 from stable_baselines3 import DQN as DQN_
 from stable_baselines3.common.monitor import Monitor
 
 from algorithms.rl.dqn.RewardCallback import SaveOnBestTrainingRewardCallback
+from config.Global import GlobalConfig
 
 
 class DQN:
@@ -22,13 +23,14 @@ class DQN:
         self.total_timesteps = config.total_timesteps
 
         # Set up a monitor for the training phase
-        self.callback = SaveOnBestTrainingRewardCallback(self.id_, check_freq=100, log_dir=config.log_dir, verbose=config.verbose)
+        # self.callback = SaveOnBestTrainingRewardCallback(self.id_, check_freq=1, log_dir=config.log_dir, verbose=config.verbose)
 
         # Instantiate the custom gym environment
         self.env = gym.make("gym_pycre:pycre-v0", network_slice=network_slice)
+        # self.env = gym.make("CartPole-v0")
 
         # Create Monitor
-        self.env = Monitor(self.env, config.log_dir)
+        self.env = Monitor(TimeLimit(env=self.env, max_episode_steps=100), filename=os.path.join(GlobalConfig.DEFAULT.rlm_path, "logs"))
 
         # Instantiate the model
         if pretrained_model is None:
@@ -43,7 +45,13 @@ class DQN:
         self.evaluation["satisfaction"].append(network_slice.cluster.evaluation["satisfaction"])
 
     def learn(self):
-        self.model.learn(total_timesteps=self.total_timesteps, callback=self.callback)
+        # self.model.learn(total_timesteps=self.total_timesteps, callback=self.callback)
+        self.model.learn(total_timesteps=self.total_timesteps)
+
+        print("Episode Lengths: {}".format(self.env.get_episode_lengths()))
+        print("Episode Rewards: {}".format(self.env.get_episode_rewards()))
+
+        self.model.save(os.path.join(GlobalConfig.DEFAULT.rlm_path, "models", "model_{}.zip".format(self.id_)))
 
     def run(self):
         obs = self.env.reset()

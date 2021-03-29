@@ -16,7 +16,7 @@ class SaveOnBestTrainingRewardCallback(BaseCallback):
     :param verbose: (int)
     """
     def __init__(self, id_, check_freq: int, log_dir: str, verbose=1):
-        super(SaveOnBestTrainingRewardCallback, self).__init__(verbose)
+        super(SaveOnBestTrainingRewardCallback, self).__init__(1)
         self.check_freq = check_freq
         self.log_dir = log_dir
         self.save_path = os.path.join(log_dir, 'best_model')

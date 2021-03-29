@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
@@ -10,6 +11,7 @@ from stable_baselines3.common.monitor import load_results
 from stable_baselines3.common.results_plotter import ts2xy
 
 from config.DQNConfig import DQNConfig
+from config.Global import GlobalConfig
 from config.network import Network
 
 
@@ -311,35 +313,19 @@ def get_mean_evaluation_cluster(data, filename, marker=''):
 
 
 def moving_average(values, window):
-    """
-    Smooth values by doing a moving average
-    :param values: (numpy array)
-    :param window: (int)
-    :return: (numpy array)
-    """
     weights = np.repeat(1.0, window) / window
     return np.convolve(values, weights, 'valid')
 
 
-def plot_results(log_folder, title='Learning Curve'):
-    """
-    plot the results
+def get_learning_curve(path_dict, window, path, image_id):
+    for key in path_dict:
+        x, y = ts2xy(load_results(path_dict[key]), 'timesteps')
+        y = moving_average(y, window=window)
+        x = x[len(x) - len(y):]
+        plt.plot(x, y, label=key)
 
-    :param log_folder: (str) the save location of the results to plot
-    :param title: (str) the title of the task to plot
-    """
-    teste = load_results(log_folder)
-    x, y = ts2xy(teste, 'timesteps')
-    y = moving_average(y, window=1000)
-    # Truncate x
-    x = x[len(x) - len(y):]
-
-    fig = plt.figure(title)
-    plt.plot(x, y)
     plt.xlabel('Number of Timesteps')
     plt.ylabel('Rewards')
-    plt.title(title + " Smoothed")
-    plt.show()
-
-
-# plot_results(DQNConfig.DEFAULT.log_dir, "AAA")
+    plt.grid(linestyle=':')
+    plt.legend(loc='best')
+    plt.savefig(os.path.join(path, "{}_learning_curve.eps".format(image_id)), dpi=GlobalConfig.DEFAULT.image_resolution)
