@@ -1,6 +1,6 @@
 import os
 
-from config.Global import GlobalConfig
+from config.GlobalConfig import GlobalConfig
 from utils.charts import get_learning_curve
 
 # Setting avaliable UE density values

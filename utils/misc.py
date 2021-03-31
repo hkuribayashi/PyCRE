@@ -52,14 +52,19 @@ def get_efficiency(sinr):
     return efficiency
 
 
-def save_to_csv(data, path, filename):
-    with open('{}{}'.format(path, filename), 'w', newline='') as f:
+def save_to_csv(data, path):
+    with open(path, 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(data)
 
 
 def load_from_csv(path, filename):
     data = pd.read_csv('{}{}'.format(path, filename), header=None, delimiter=',', sep=',')
+    return data
+
+def load_from_csv_number(path, filename, number):
+    cols = np.arange(number)
+    data = pd.read_csv('{}{}'.format(path, filename), header=None, delimiter=',', sep=',', names=cols)
     return data
 
 

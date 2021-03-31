@@ -16,7 +16,7 @@ class RLM:
         self.evaluation = None
 
     def learn(self):
-        self.rl_engine.learn()
+        return self.rl_engine.learn()
 
     def run(self):
         self.rl_engine.run()

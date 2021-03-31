@@ -5,7 +5,7 @@ import pickle
 from stable_baselines3.common.monitor import Monitor
 
 from config.DQNConfig import DQNConfig
-from config.Global import GlobalConfig
+from config.GlobalConfig import GlobalConfig
 from modules.rlm.RLM import RLM
 from modules.rlm.ReinforcementLearningMethod import ReinforcementLearningMethod
 

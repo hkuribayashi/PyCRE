@@ -11,7 +11,7 @@ from stable_baselines3.common.monitor import load_results
 from stable_baselines3.common.results_plotter import ts2xy
 
 from config.DQNConfig import DQNConfig
-from config.Global import GlobalConfig
+from config.GlobalConfig import GlobalConfig
 from config.network import Network
 
 

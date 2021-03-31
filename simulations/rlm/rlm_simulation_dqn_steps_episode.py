@@ -5,13 +5,19 @@ import pickle
 from stable_baselines3.common.monitor import Monitor
 
 from config.DQNConfig import DQNConfig
-from config.Global import GlobalConfig
+from config.GlobalConfig import GlobalConfig
 from modules.rlm.RLM import RLM
 from modules.rlm.ReinforcementLearningMethod import ReinforcementLearningMethod
-
+from utils.misc import save_to_csv
 
 # Get user density
 user_density = int(sys.argv[1])
+
+# Get start range
+start = int(sys.argv[2])
+
+# Get stop range
+stop = int(sys.argv[3])
 
 if user_density == 300:
     n_bs = 200
@@ -51,7 +57,6 @@ learning_rate = [0.5, 0.1, 0.01, 0.001, 0.0001]
 original_monitor_value = copy.deepcopy(Monitor.EXT)
 
 for lr in learning_rate:
-    mean_satisfaction = []
 
     config = DQNConfig.DEFAULT
     config.learning_rate = lr
@@ -62,7 +67,10 @@ for lr in learning_rate:
     print("Starting RLM (DQN) - LR {} with {} UEs/km2 and {} BSs/km2".format(lr, user_density, n_bs))
     print("Analysing {} network slice".format(range_))
 
-    for id_slice in range(2):
+    episode_lengths = []
+    episode_rewards = []
+
+    for id_slice in range(start, stop):
 
         # Debug
         print("Slice ID {} - LR {}".format(id_slice, lr))
@@ -79,4 +87,14 @@ for lr in learning_rate:
         rlm = RLM(full_id, ReinforcementLearningMethod.DQN, network_slice, config)
 
         # Start the trainning phase and monitor the results
-        rlm.learn()
+        learning_results = rlm.learn()
+
+        episode_lengths.append(learning_results["episode_lengths"])
+        episode_rewards.append(learning_results["episode_rewards"])
+
+    # Save results
+    path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "csv", "rlm_dqn_episode_lengths_{}_{}.csv".format(user_density, lr))
+    save_to_csv(episode_lengths, path)
+
+    path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "csv", "rlm_dqn_episode_rewards_{}_{}.csv".format(user_density, lr))
+    save_to_csv(episode_rewards, path)
