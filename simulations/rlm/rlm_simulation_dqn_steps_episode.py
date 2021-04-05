@@ -51,7 +51,7 @@ except IOError:
 finally:
     filehandler.close()
 
-learning_rate = [0.5, 0.1, 0.01, 0.001, 0.0001]
+learning_rate = [0.1, 0.01, 0.001, 0.0001]
 
 
 original_monitor_value = copy.deepcopy(Monitor.EXT)

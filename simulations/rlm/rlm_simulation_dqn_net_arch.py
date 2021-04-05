@@ -8,9 +8,16 @@ from config.DQNConfig import DQNConfig
 from config.GlobalConfig import GlobalConfig
 from modules.rlm.RLM import RLM
 from modules.rlm.ReinforcementLearningMethod import ReinforcementLearningMethod
+from utils.misc import save_to_csv
 
 # Get user density
 user_density = int(sys.argv[1])
+
+# Get start range
+start = int(sys.argv[2])
+
+# Get stop range
+stop = int(sys.argv[3])
 
 if user_density == 300:
     n_bs = 200
@@ -22,13 +29,13 @@ else:
 global filehandler
 
 try:
-    slice_test_filename = os.path.join(GlobalConfig.rlm_path, "data", "slice_list_computed_{}_{}.obj".format(user_density, n_bs))
+    slice_test_filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "slice_list_computed_{}_{}.obj".format(user_density, n_bs))
     filehandler = open(slice_test_filename, 'rb')
     slice_list = pickle.load(filehandler)
 
 except IOError:
     # Load cluster list
-    filename = os.path.join(GlobalConfig.iom_path, "data", "slice_list_{}_{}_75_pop_400.obj".format(user_density, n_bs))
+    filename = os.path.join(GlobalConfig.DEFAULT.iom_path, "data", "slice_list_{}_{}_75_pop_400.obj".format(user_density, n_bs))
     filehandler = open(filename, 'rb')
     slice_list = pickle.load(filehandler)
 
@@ -37,39 +44,60 @@ except IOError:
     for network_slice in slice_list:
         network_slice.compute_selected_bs()
 
-    selected_filename = os.path.join(GlobalConfig.rlm_path, "data", "slice_list_computed_{}_{}.obj".format(user_density, n_bs))
+    selected_filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "slice_list_computed_{}_{}.obj".format(user_density, n_bs))
     filehandler = open(selected_filename, 'wb')
     pickle.dump(slice_list, filehandler)
 
 finally:
     filehandler.close()
 
-net_arch_options = dict()
-net_arch_options[32] = [32, 32]
-net_arch_options[64] = [64, 64]
-net_arch_options[128] = [128, 128]
+net_arch = [[64,32,32,20], [64,32,32]]
+
 
 original_monitor_value = copy.deepcopy(Monitor.EXT)
 
-for key in net_arch_options:
-    mean_satisfaction = []
+for arch in net_arch:
+
+    id_ = "{}_hl".format(len(arch))
 
     config = DQNConfig.DEFAULT
-    config.net_arch = net_arch_options[key]
+    config.net_arch = arch
+    config.learning_rate = 0.001
 
-    # Debug
-    print("Starting RLM (DQN) - net_arch {} with {} UEs/km2 and {} BSs/km2".format(net_arch_options[key], user_density, n_bs))
+    range_ = len(slice_list)
+    range_ = range_ if range_ < 100 else 100
 
-    # Adjusting the Monitor Ext ID
-    Monitor.EXT = "{}_{}_{}_{}".format(user_density, key, 0, original_monitor_value)
+    print("Starting RLM (DQN) - LR {} with {} UEs/km2 and {} BSs/km2".format(arch, user_density, n_bs))
+    print("Analysing {} network slice".format(range_))
 
-    # Get the network slice
-    network_slice = slice_list[0]
+    episode_lengths = []
+    episode_rewards = []
 
-    full_id = "{}_{}_{}".format(user_density, key, 0)
+    for id_slice in range(start, stop):
 
-    # Instantiate the RL Module
-    rlm = RLM(full_id, ReinforcementLearningMethod.DQN, network_slice, config)
+        # Debug
+        print("Slice ID {} - LR {}".format(id_slice, arch))
 
-    # Start the trainning phase and monitor the results
-    rlm.learn()
+        # Get the network slice
+        network_slice = slice_list[id_slice]
+
+        # Adjusting the Monitor Ext ID
+        Monitor.EXT = "{}_{}_{}_{}".format(user_density, id_, id_slice, original_monitor_value)
+
+        full_id = "{}_{}_{}".format(user_density, id_, id_slice)
+
+        # Instantiate the RL Module
+        rlm = RLM(full_id, ReinforcementLearningMethod.DQN, network_slice, config)
+
+        # Start the trainning phase and monitor the results
+        learning_results = rlm.learn()
+
+        episode_lengths.append(learning_results["episode_lengths"])
+        episode_rewards.append(learning_results["episode_rewards"])
+
+    # Save results
+    path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "csv", "rlm_dqn_episode_lengths_{}_{}.csv".format(user_density, id_))
+    save_to_csv(episode_lengths, path)
+
+    path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "csv", "rlm_dqn_episode_rewards_{}_{}.csv".format(user_density, id_))
+    save_to_csv(episode_rewards, path)

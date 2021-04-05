@@ -253,7 +253,8 @@ def get_barchart(cluster_data, path, z=1.96):
         plt.ylabel(ylabel)
         plt.grid(linestyle=':', zorder=1)
         plt.legend(loc='best')
-        plt.savefig('{}{}'.format(path, "{}.eps".format(filename)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+        plt.savefig('{}{}'.format(path, "{}.eps".format(filename)), dpi=Network.DEFAULT.image_resolution,
+                    bbox_inches='tight')
 
 
 def get_bar_chart(mean_n_bs, mean_load_per_weight, path, filename):
@@ -264,7 +265,7 @@ def get_bar_chart(mean_n_bs, mean_load_per_weight, path, filename):
 
     r1 = np.arange(len(m_n_bs))
     r2 = [x + bar_width + 0.02 for x in r1]
-    r3 = (r1 + r2)/2
+    r3 = (r1 + r2) / 2
 
     plt.bar(r1, m_n_bs, width=bar_width, label="Percentage of Slices by Number of BSs", zorder=10)
     plt.bar(r2, m_l_bs, width=bar_width, label="Slice Load Average", zorder=10)
@@ -276,7 +277,8 @@ def get_bar_chart(mean_n_bs, mean_load_per_weight, path, filename):
     # Create legend & Show graphic
     plt.grid(linestyle=':', zorder=1)
     plt.legend()
-    plt.savefig('{}{}'.format(path, "{}.eps".format(filename)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+    plt.savefig('{}{}'.format(path, "{}.eps".format(filename)), dpi=Network.DEFAULT.image_resolution,
+                bbox_inches='tight')
 
 
 def get_pareto_frontier(gwo_evaluation_f1, gwo_evaluation_f2, mogwo_evaluation, path, filename):
@@ -317,15 +319,31 @@ def moving_average(values, window):
     return np.convolve(values, weights, 'valid')
 
 
-def get_learning_curve(path_dict, window, path, image_id):
-    for key in path_dict:
-        x, y = ts2xy(load_results(path_dict[key]), 'timesteps')
-        y = moving_average(y, window=window)
-        x = x[len(x) - len(y):]
-        plt.plot(x, y, label=key)
+def get_learning_rate_curve(data, path, image_id):
+    plt.rc('text', usetex=True)
+    plt.rcParams["savefig.pad_inches"] = 0.05
+    for key in data:
+        plt.plot(data[key], label="$\delta={}$".format(key))
 
-    plt.xlabel('Number of Timesteps')
-    plt.ylabel('Rewards')
+    plt.xlabel('Episodes')
+    plt.ylabel('Smoothing Training Steps')
+    plt.xlim(0, 1005)
     plt.grid(linestyle=':')
     plt.legend(loc='best')
-    plt.savefig(os.path.join(path, "{}_learning_curve.eps".format(image_id)), dpi=GlobalConfig.DEFAULT.image_resolution)
+    plt.legend()
+    plt.savefig(os.path.join(path, "{}_learning_curve.eps".format(image_id)), dpi=GlobalConfig.DEFAULT.image_resolution, bbox_inches='tight')
+
+
+def get_episode_rewards_curve(data, path, image_id):
+    plt.rc('text', usetex=True)
+    plt.rcParams["savefig.pad_inches"] = 0.05
+    for key in data:
+        plt.plot(data[key], label="$\delta={}$".format(key))
+
+    plt.xlabel('Episodes')
+    plt.ylabel('Smoothing of Rewards Obtained')
+    plt.xlim(0, 1005)
+    plt.grid(linestyle=':')
+    plt.legend(loc='best')
+    plt.legend()
+    plt.savefig(os.path.join(path, "{}_episode_rewards.eps".format(image_id)), dpi=GlobalConfig.DEFAULT.image_resolution, bbox_inches='tight')

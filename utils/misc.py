@@ -1,3 +1,4 @@
+import os
 import csv
 import pandas as pd
 import numpy as np
@@ -62,9 +63,11 @@ def load_from_csv(path, filename):
     data = pd.read_csv('{}{}'.format(path, filename), header=None, delimiter=',', sep=',')
     return data
 
+
 def load_from_csv_number(path, filename, number):
+    full_path = os.path.join(path, filename)
     cols = np.arange(number)
-    data = pd.read_csv('{}{}'.format(path, filename), header=None, delimiter=',', sep=',', names=cols)
+    data = pd.read_csv(full_path, header=None, delimiter=',', sep=',', names=cols)
     return data
 
 
