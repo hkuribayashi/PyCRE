@@ -319,7 +319,33 @@ def moving_average(values, window):
     return np.convolve(values, weights, 'valid')
 
 
-def get_learning_rate_curve(data, path, image_id):
+def get_net_arch_episode_lengths_curve(data, path, image_id):
+    for key in data:
+        plt.plot(data[key], label=key)
+
+    plt.xlabel('Episodes')
+    plt.ylabel('Smoothing Training Steps')
+    plt.xlim(0, 1005)
+    plt.grid(linestyle=':')
+    plt.legend(loc='best')
+    plt.legend()
+    plt.savefig(os.path.join(path, "{}_net_arch_episode_lengths.eps".format(image_id)), dpi=GlobalConfig.DEFAULT.image_resolution, bbox_inches='tight')
+
+
+def get_net_arch_episode_rewards_curve(data, path, image_id):
+    for key in data:
+        plt.plot(data[key], label=key)
+
+    plt.xlabel('Episodes')
+    plt.ylabel('Smoothing of Obtained Rewards')
+    plt.xlim(0, 1005)
+    plt.grid(linestyle=':')
+    plt.legend(loc='best')
+    plt.legend()
+    plt.savefig(os.path.join(path, "{}_net_arch_episode_rewards.eps".format(image_id)), dpi=GlobalConfig.DEFAULT.image_resolution, bbox_inches='tight')
+
+
+def get_learning_rate_episode_lengths_curve(data, path, image_id):
     plt.rc('text', usetex=True)
     plt.rcParams["savefig.pad_inches"] = 0.05
     for key in data:
@@ -331,19 +357,19 @@ def get_learning_rate_curve(data, path, image_id):
     plt.grid(linestyle=':')
     plt.legend(loc='best')
     plt.legend()
-    plt.savefig(os.path.join(path, "{}_learning_curve.eps".format(image_id)), dpi=GlobalConfig.DEFAULT.image_resolution, bbox_inches='tight')
+    plt.savefig(os.path.join(path, "{}_learning_rate_episode_lengths.eps".format(image_id)), dpi=GlobalConfig.DEFAULT.image_resolution, bbox_inches='tight')
 
 
-def get_episode_rewards_curve(data, path, image_id):
+def get_learning_rate_episode_rewards_curve(data, path, image_id):
     plt.rc('text', usetex=True)
     plt.rcParams["savefig.pad_inches"] = 0.05
     for key in data:
         plt.plot(data[key], label="$\delta={}$".format(key))
 
     plt.xlabel('Episodes')
-    plt.ylabel('Smoothing of Rewards Obtained')
+    plt.ylabel('Smoothing of Obtained Rewards')
     plt.xlim(0, 1005)
     plt.grid(linestyle=':')
     plt.legend(loc='best')
     plt.legend()
-    plt.savefig(os.path.join(path, "{}_episode_rewards.eps".format(image_id)), dpi=GlobalConfig.DEFAULT.image_resolution, bbox_inches='tight')
+    plt.savefig(os.path.join(path, "{}_learning_rate_episode_rewards.eps".format(image_id)), dpi=GlobalConfig.DEFAULT.image_resolution, bbox_inches='tight')

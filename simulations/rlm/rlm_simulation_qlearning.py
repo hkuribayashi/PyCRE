@@ -1,70 +1,93 @@
+import os
 import sys
+import gym
 import pickle
+from stable_baselines3 import DQN
 
-from config.QLConfig import QLConfig
-from algorithms.rl.qlearning.Environment import Environment
-from algorithms.rl.qlearning.QLSingleAgent import QLSigleAgent
-from modules.rlm.RLM import RLM
-from modules.rlm.ReinforcementLearningMethod import ReinforcementLearningMethod
-from utils.misc import save_to_csv
+from config.GlobalConfig import GlobalConfig
+from config.network import Network
+from modules.dcm.Cluster import Cluster
+from modules.iom.Slice import Slice
+from network.hetnet import HetNet
 
 
-# Get user density
-user_density = int(sys.argv[1])
+simulations = int(sys.argv[1])
+user_density = int(sys.argv[2])
+max_steps = 100
 
-# Get number of BSs
-n_bs = int(sys.argv[2])
+if user_density == 300:
+    n_bs = 200
+elif user_density == 600:
+    n_bs = 400
+else:
+    n_bs = 800
 
-# Get the path to save results
-path = sys.argv[3]
+satisfaction_result = []
+mean_load_result = []
 
-global filehandler
+for id_ in range(simulations):
+    satisfaction = []
+    mean_load = []
 
-try:
-    slice_test_filename = "/Users/hugo/Desktop/PyCRE/rlm/data/slice_list_computed_{}_{}.obj".format(user_density, n_bs)
-    filehandler = open(slice_test_filename, 'rb')
-    slice_list = pickle.load(filehandler)
+    # Create a new HetNet
+    h = HetNet(Network.DEFAULT)
 
-except IOError:
-    # Load cluster list
-    filename = "/Users/hugo/Desktop/PyCRE/iom/data/slice_list_{}_{}_75_pop_400.obj".format(user_density, n_bs)
-    filehandler = open(filename, 'rb')
-    slice_list = pickle.load(filehandler)
+    # Create SBS
+    h.populate_bs(n_bs)
 
-    # Saving the biggest slice for testing pourposes
-    # slice_list.sort(key=lambda x: len(x.cluster.bs_list), reverse=True)
-    for slice_ in slice_list:
-        slice_.compute_selected_bs()
+    # Run the HetNet
+    h.run(user_density)
+    load = 0
+    for bs in h.list_bs:
+        load += (bs.load/bs.max_load) * 100
+    mean_load_hetnet = load / len(h.list_bs)
 
-    selected_filename = "/Users/hugo/Desktop/PyCRE/rlm/data/slice_list_computed_{}_{}.obj".format(user_density, n_bs)
-    filehandler = open(selected_filename, 'wb')
-    pickle.dump(slice_list, filehandler)
+    print("Satisfaction: {}".format(h.evaluation["satisfaction"]))
+    print("Mean Load: {}".format(mean_load_hetnet))
 
-finally:
-    filehandler.close()
+    satisfaction.append(h.evaluation["satisfaction"])
+    mean_load.append(mean_load_hetnet)
 
-# Setting reinforcement Learning configs
-config = QLConfig.DEFAULT
-config.verbose = False
+    cluster = Cluster(0, h.env.priority_ues_weight, h.env.ordinary_ues_weight, h.env.outage_threshold)
+    cluster.bs_list = h.list_bs
+    cluster.ue_list = h.ue_list
+    network_slice = Slice(cluster, [])
+    network_slice.selected_bs = h.list_bs
+    cluster.evaluation['satisfaction'] = h.evaluation["satisfaction"]
 
-# Mean Evaluation for all Slices
-# 101: Number of episodes + the inicial cluster evaluation
-mean_satisfaction = []
+    gym_env = gym.make("gym_pycre:pycre-v0", network_slice=network_slice)
+    policy = dict(net_arch=[64,32,32,20])
+    learning_rate = 0.001
 
-size = len(slice_list)
-range_ = size if size < 50 else 50
+    model = DQN("MlpPolicy", gym_env, policy_kwargs=policy, learning_rate=learning_rate, verbose=1)
+    model.learn(total_timesteps=10000)
+    path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "models", "model_dqn_full_{}.zip".format(id_))
+    model.save(path)
 
-# Debug
-print("Starting RLM (Q-Learning) with {} UEs/km2 and {} BSs/km2".format(user_density, n_bs))
-print("Analysing {} network slices".format(size))
+    obs = gym_env.reset()
+    print(obs)
+    step = 0
+    while step < max_steps:
+        action, _states = model.predict(obs, deterministic=True)
+        obs, reward, done, info = gym_env.step(action)
+        print("Step {} - Satisfaction: {}".format(step, info["satisfaction"]))
+        satisfaction.append(info["satisfaction"])
+        mean_load.append(info["mean_load"])
 
-for id_ in range(size):
-    slice_ = slice_list[id_]
-    print("Slice Index {}".format(id_))
-    rlm = RLM(rl_method=ReinforcementLearningMethod.QLEARNING, network_slice=slice_, config=config)
-    rlm.run()
-    mean_satisfaction.append(rlm.evaluation["satisfaction"])
-    print(rlm.evaluation["satisfaction"])
+        step += 1
 
-# Compute mean and save results
-save_to_csv(list(mean_satisfaction), path, "rlm_qlearning_{}_{}.csv".format(user_density, n_bs))
+    print(satisfaction)
+    print(mean_load)
+    satisfaction_result.append(satisfaction)
+    mean_load_result.append(mean_load)
+
+filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "satisfaction_list_{}_dqn_full.obj".format(user_density))
+filehandler = open(filename, 'wb')
+pickle.dump(satisfaction_result, filehandler)
+filehandler.close()
+
+filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "mean_load_list_{}_dqn_full.obj".format(user_density))
+filehandler = open(filename, 'wb')
+pickle.dump(mean_load_result, filehandler)
+filehandler.close()
+

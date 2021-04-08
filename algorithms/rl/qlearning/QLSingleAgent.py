@@ -30,7 +30,7 @@ class QLSigleAgent:
         self.evaluation["satisfaction"] = list()
         self.evaluation["load"] = list()
 
-        self.evaluation["satisfaction"].append(self.env.slice.cluster.evaluation["satisfaction"])
+        self.evaluation["satisfaction"].append(self.env.network_slice.cluster.evaluation["satisfaction"])
 
     def run(self):
 

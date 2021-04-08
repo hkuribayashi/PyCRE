@@ -29,13 +29,15 @@ else:
 global filehandler
 
 try:
-    slice_test_filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "slice_list_computed_{}_{}.obj".format(user_density, n_bs))
+    slice_test_filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data",
+                                       "slice_list_computed_{}_{}.obj".format(user_density, n_bs))
     filehandler = open(slice_test_filename, 'rb')
     slice_list = pickle.load(filehandler)
 
 except IOError:
     # Load cluster list
-    filename = os.path.join(GlobalConfig.DEFAULT.iom_path, "data", "slice_list_{}_{}_75_pop_400.obj".format(user_density, n_bs))
+    filename = os.path.join(GlobalConfig.DEFAULT.iom_path, "data",
+                            "slice_list_{}_{}_75_pop_400.obj".format(user_density, n_bs))
     filehandler = open(filename, 'rb')
     slice_list = pickle.load(filehandler)
 
@@ -44,21 +46,22 @@ except IOError:
     for network_slice in slice_list:
         network_slice.compute_selected_bs()
 
-    selected_filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "slice_list_computed_{}_{}.obj".format(user_density, n_bs))
+    selected_filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data",
+                                     "slice_list_computed_{}_{}.obj".format(user_density, n_bs))
     filehandler = open(selected_filename, 'wb')
     pickle.dump(slice_list, filehandler)
 
 finally:
     filehandler.close()
 
-net_arch = [[64,32,32,20], [64,32,32]]
-
+# net_arch = [[64, 32, 32, 20], [64, 32, 32, 64], [64, 64, 64, 20], [64, 64, 64, 32]]
+net_arch = [[64, 32, 32, 64], [64, 64, 64, 20], [64, 64, 64, 32]]
 
 original_monitor_value = copy.deepcopy(Monitor.EXT)
 
-for arch in net_arch:
+for i, arch in enumerate(net_arch):
 
-    id_ = "{}_hl".format(len(arch))
+    id_ = "{}_neurons_{}".format(len(arch), i)
 
     config = DQNConfig.DEFAULT
     config.net_arch = arch
@@ -74,7 +77,6 @@ for arch in net_arch:
     episode_rewards = []
 
     for id_slice in range(start, stop):
-
         # Debug
         print("Slice ID {} - LR {}".format(id_slice, arch))
 
@@ -96,8 +98,10 @@ for arch in net_arch:
         episode_rewards.append(learning_results["episode_rewards"])
 
     # Save results
-    path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "csv", "rlm_dqn_episode_lengths_{}_{}.csv".format(user_density, id_))
+    path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "csv",
+                        "rlm_dqn_episode_lengths_{}_{}.csv".format(user_density, id_))
     save_to_csv(episode_lengths, path)
 
-    path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "csv", "rlm_dqn_episode_rewards_{}_{}.csv".format(user_density, id_))
+    path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "csv",
+                        "rlm_dqn_episode_rewards_{}_{}.csv".format(user_density, id_))
     save_to_csv(episode_rewards, path)

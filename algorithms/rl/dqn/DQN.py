@@ -25,7 +25,6 @@ class DQN:
 
         # Instantiate the custom gym environment
         self.env = gym.make("gym_pycre:pycre-v0", network_slice=network_slice)
-        # self.env = gym.make("CartPole-v0")
 
         # Create Monitor
         self.env = Monitor(TimeLimit(env=self.env, max_episode_steps=self.max_episode_steps), filename=os.path.join(GlobalConfig.DEFAULT.rlm_path, "logs"))
@@ -43,7 +42,6 @@ class DQN:
         self.evaluation["satisfaction"].append(network_slice.cluster.evaluation["satisfaction"])
 
     def learn(self):
-        # self.model.learn(total_timesteps=self.total_timesteps, callback=self.callback)
         self.model.learn(total_timesteps=self.total_timesteps)
         learning_results = {"episode_lengths": self.env.get_episode_lengths(), "episode_rewards": self.env.get_episode_rewards()}
         self.model.save(os.path.join(GlobalConfig.DEFAULT.rlm_path, "models", "model_{}.zip".format(self.id_)))

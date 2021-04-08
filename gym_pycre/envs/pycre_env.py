@@ -3,6 +3,7 @@ import copy
 import numpy as np
 from gym import spaces
 
+
 class PyCREEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
@@ -42,10 +43,11 @@ class PyCREEnv(gym.Env):
 
         info = dict()
         info["satisfaction"] = self.compute_satisfaction()
+        info["mean_load"] = self.compute_bs_load()
         new_state = int(info["satisfaction"])
 
         # Check if the current episode is done
-        if new_state >= 75:
+        if new_state >= 90:
             done = True
         else:
             done = False
@@ -53,7 +55,7 @@ class PyCREEnv(gym.Env):
         reward = 0.0
         if not full_flag:
             # Computing current reward
-            if new_state >= 75:
+            if new_state >= 90:
                 reward = 100
             elif new_state > self.current_state:
                 divisor = 1 if self.current_state == 0 else self.current_state
@@ -114,3 +116,10 @@ class PyCREEnv(gym.Env):
         total_weights = total_priority_ues * self.priority_ues_weight + total_ordinary_ues * self.ordinary_ues_weight
 
         return (weighted_sum / total_weights) * 100
+
+    def compute_bs_load(self):
+        load = 0
+        for bs in self.working_slice.selected_bs:
+            load += (bs.load/bs.max_load) * 100
+        mean_load = load/len(self.working_slice.selected_bs)
+        return mean_load
