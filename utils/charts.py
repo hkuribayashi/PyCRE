@@ -132,33 +132,28 @@ def get_visual_pareto(data):
 
 
 def get_violinchart(data, key):
-    sns.violinplot(x=data["Algorithm"], y=data["Mean Number of Clusters"])
-    plt.grid(linestyle=':', zorder=1)
-    plt.savefig(
-        '{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_violin_number_of_clusters_{}.eps".format(key)),
-        dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+    # sns.violinplot(x=data["Algorithm"], y=data["Mean Number of Clusters"], scale_hue=False)
+    # sns.swarmplot(x="Algorithm", y="Mean Number of Clusters", data=data)
+    # plt.grid(linestyle=':', zorder=1)
+    # plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_violin_number_of_clusters_{}.eps".format(key)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
 
-    plt.figure()
-    sns.violinplot(x=data["Algorithm"], y=data["Mean Number of Samples per Clusters"])
+    # plt.figure()
+    # sns.violinplot(x=data["Algorithm"], y=data["Mean Number of Samples per Clusters"])
+    sns.swarmplot(x="Algorithm", y="Mean Number of Samples per Clusters", data=data)
     plt.grid(linestyle=':', zorder=1)
-    plt.savefig(
-        '{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_violin_number_of_samples_{}.eps".format(key)),
-        dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_violin_number_of_samples_{}.eps".format(key)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
 
 
 def get_scatterplot(data, key):
-    sns.lmplot(x='index', y="Mean Number of Clusters", data=data.reset_index(), fit_reg=False, hue='Algorithm',
-               legend=False, markers=["o", "x", "1"], palette=dict(DBSCAN='#1f77b4', KMeans='#e1802c', Birch='#3a913a'))
+    # sns.lmplot(x='index', y="Mean Number of Clusters", data=data.reset_index(), fit_reg=False, hue='Algorithm', legend=False, markers=["o", "x", "1"], palette=dict(DBSCAN='#1f77b4', KMeans='#e1802c', Birch='#3a913a'))
+    sns.lmplot(x='index', y="Mean Number of Clusters", data=data.reset_index(), fit_reg=False, hue='Algorithm', legend=False, markers=["o", "x"], palette=dict(KMeans='#e1802c', Birch='#3a913a'))
     plt.grid(linestyle=':', zorder=1)
     plt.legend(loc='upper right')
-    plt.savefig(
-        '{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_scatter_number_of_clusters_{}.eps".format(key)),
-        dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
+    plt.savefig('{}{}'.format("/Users/hugo/Desktop/PyCRE/dcm/images/", "dcm_scatter_number_of_clusters_{}.eps".format(key)), dpi=Network.DEFAULT.image_resolution, bbox_inches='tight')
 
     plt.figure()
-    sns.lmplot(x='index', y="Mean Number of Samples per Clusters", data=data.reset_index(), fit_reg=False,
-               hue='Algorithm', legend=False, markers=["o", "x", "1"],
-               palette=dict(DBSCAN='#1f77b4', KMeans='#e1802c', Birch='#3a913a'))
+    # sns.lmplot(x='index', y="Mean Number of Samples per Clusters", data=data.reset_index(), fit_reg=False, hue='Algorithm', legend=False, markers=["o", "x", "1"], palette=dict(DBSCAN='#1f77b4', KMeans='#e1802c', Birch='#3a913a'))
+    sns.lmplot(x='index', y="Mean Number of Samples per Clusters", data=data.reset_index(), fit_reg=False, hue='Algorithm', legend=False, markers=["o", "x"], palette=dict(KMeans='#e1802c', Birch='#3a913a'))
     plt.grid(linestyle=':', zorder=1)
     plt.legend(loc='upper right')
     plt.savefig(
@@ -373,3 +368,22 @@ def get_learning_rate_episode_rewards_curve(data, path, image_id):
     plt.legend(loc='best')
     plt.legend()
     plt.savefig(os.path.join(path, "{}_learning_rate_episode_rewards.eps".format(image_id)), dpi=GlobalConfig.DEFAULT.image_resolution, bbox_inches='tight')
+
+
+def get_training_steps_curve(data, path, xlabel="Episodes", ylabel="Smoothing Training Steps", xlim=(0, 1005), pad_inches=None):
+    plt.rc('text', usetex=True)
+    mpl.rcParams['mathtext.fontset'] = 'cm'
+    mpl.rcParams['mathtext.rm'] = 'serif'
+    if pad_inches is not None:
+        plt.rcParams["savefig.pad_inches"] = pad_inches
+
+    for key in data:
+        plt.plot(data[key], label=key)
+
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.xlim(xlim)
+    plt.grid(linestyle=':')
+    plt.legend(loc='best')
+    plt.legend()
+    plt.savefig(path, dpi=GlobalConfig.DEFAULT.image_resolution, bbox_inches='tight')

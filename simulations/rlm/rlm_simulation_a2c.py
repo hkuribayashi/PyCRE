@@ -2,7 +2,7 @@ import os
 import sys
 import gym
 import pickle
-from stable_baselines3 import DQN
+from stable_baselines3 import A2C
 
 from config.GlobalConfig import GlobalConfig
 from config.network import Network
@@ -55,13 +55,11 @@ for id_ in range(simulations):
     network_slice.selected_bs = h.list_bs
     cluster.evaluation['satisfaction'] = h.evaluation["satisfaction"]
 
-    gym_env = gym.make("gym_pycre:pycre-v0", network_slice=network_slice)
-    policy = dict(net_arch=[64,32,32,20])
-    learning_rate = 0.001
+    gym_env = gym.make("gym_pycre:pycre-v2", network_slice=network_slice)
 
-    model = DQN("MlpPolicy", gym_env, policy_kwargs=policy, learning_rate=learning_rate, verbose=1)
+    model = A2C("MlpPolicy", gym_env, verbose=1)
     model.learn(total_timesteps=10000)
-    path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "models", "model_dqn_full_{}.zip".format(id_))
+    path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "models", "{}_model_a2c_full_{}.zip".format(user_density, id_))
     model.save(path)
 
     obs = gym_env.reset()
@@ -81,12 +79,12 @@ for id_ in range(simulations):
     satisfaction_result.append(satisfaction)
     mean_load_result.append(mean_load)
 
-filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "satisfaction_list_{}_dqn_full.obj".format(user_density))
+filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "satisfaction_list_{}_a2c_full.obj".format(user_density))
 filehandler = open(filename, 'wb')
 pickle.dump(satisfaction_result, filehandler)
 filehandler.close()
 
-filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "mean_load_list_{}_dqn_full.obj".format(user_density))
+filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "mean_load_list_{}_a2c_full.obj".format(user_density))
 filehandler = open(filename, 'wb')
 pickle.dump(mean_load_result, filehandler)
 filehandler.close()

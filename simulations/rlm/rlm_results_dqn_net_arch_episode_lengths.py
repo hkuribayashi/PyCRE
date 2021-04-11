@@ -1,11 +1,11 @@
 import os
 
 from config.GlobalConfig import GlobalConfig
-from utils.charts import moving_average, get_net_arch_episode_lengths_curve
+from utils.charts import moving_average, get_training_steps_curve
 from utils.misc import load_from_csv_number
 
 user_density = 900
-window = 100
+window = 50
 max_x = 1000
 csv_path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "csv")
 
@@ -30,6 +30,9 @@ data_4hl.fillna(0)
 data_4hl = data_4hl.mean(axis=0)
 mean_data_4hl = moving_average(data_4hl, window)
 
-data = {"2 layers [32,32]": mean_data_2hl[0:max_x], "3 layers [64,32,32]": mean_data_3hl[0:max_x], "4 layers [64,32,32,20]": mean_data_4hl[0:max_x]}
-image_path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "images")
-get_net_arch_episode_lengths_curve(data, image_path, user_density)
+data = {"2 layers [32,32]": mean_data_2hl[0:max_x],
+        "3 layers [64,32,32]": mean_data_3hl[0:max_x],
+        "4 layers [64,32,32,20]": mean_data_4hl[0:max_x]}
+
+path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "images", "{}_net_arch_episode_lengths.eps".format(user_density))
+get_training_steps_curve(data, path, ylabel="Smoothing Training Steps")

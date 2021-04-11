@@ -55,7 +55,7 @@ finally:
     filehandler.close()
 
 # net_arch = [[64, 32, 32, 20], [64, 32, 32, 64], [64, 64, 64, 20], [64, 64, 64, 32]]
-net_arch = [[64, 32, 32, 64], [64, 64, 64, 20], [64, 64, 64, 32]]
+net_arch = [[64, 32, 32, 20]]
 
 original_monitor_value = copy.deepcopy(Monitor.EXT)
 

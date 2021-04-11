@@ -41,5 +41,5 @@ print("Starting RLM with {} UEs/km2 and {} BSs/km2".format(user_density, n_bs))
 
 for id_ in range(5):
     network_slice = slice_list[id_]
-    env = gym.make("gym_pycre:pycre-v0", network_slice=network_slice)
+    env = gym.make("gym_pycre:pycre-v2", network_slice=network_slice)
     check_env(env)

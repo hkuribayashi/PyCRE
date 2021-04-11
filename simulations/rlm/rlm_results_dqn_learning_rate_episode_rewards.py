@@ -1,11 +1,11 @@
 import os
 
 from config.GlobalConfig import GlobalConfig
-from utils.charts import moving_average, get_learning_rate_episode_rewards_curve
+from utils.charts import moving_average, get_training_steps_curve
 from utils.misc import load_from_csv_number
 
 user_density = 900
-window = 100
+window = 50
 max_x = 1000
 csv_path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "csv")
 
@@ -37,6 +37,10 @@ data_1.fillna(0)
 data_1 = data_1.mean(axis=0)
 mean_data_1 = moving_average(data_1, window)
 
-data = {"0.1": mean_data_1[0:max_x], "0.01": mean_data_01[0:max_x], "0.001": mean_data_001[0:max_x], "0.0001": mean_data_0001[0:max_x]}
-image_path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "images")
-get_learning_rate_episode_rewards_curve(data, image_path, user_density)
+data = {"$\delta=0.1$": mean_data_1[0:max_x],
+        "$\delta=0.01$": mean_data_01[0:max_x],
+        "$\delta=0.001$": mean_data_001[0:max_x],
+        "$\delta=0.0001$": mean_data_0001[0:max_x]}
+
+path = os.path.join(GlobalConfig.DEFAULT.rlm_path, "images", "{}_learning_rate_episode_rewards.eps".format(user_density))
+get_training_steps_curve(data, path, ylabel="Smoothing Cumulative Rewards per Episode")
