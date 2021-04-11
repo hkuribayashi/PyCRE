@@ -139,7 +139,7 @@ class PyCREEnvMD(gym.Env):
         self.reward_range = (-100, 10000)
 
         actions = []
-        for _ in range(len(self.working_slice.selected_bs) ):
+        for _ in range(len(self.working_slice.selected_bs)):
             actions.append(9)
 
         self.action_space = spaces.MultiDiscrete(actions)
@@ -235,21 +235,17 @@ class PyCREEnvC(gym.Env):
         self.ordinary_ues_weight = self.working_slice.cluster.bs_list[-1].hetnet.env.ordinary_ues_weight
         self.current_state = int(self.working_slice.cluster.evaluation["satisfaction"])
         self.reward_range = (-100, 10000)
-
-        low_actions = []
-        high_actions = []
-        for _ in range(len(self.working_slice.selected_bs) ):
-            low_actions.append(10.0)
-            high_actions.append(35.0)
-
         # self.action_space = spaces.Box(low=np.array(low_actions), high=np.array(high_actions), dtype=np.float16)
         self.action_space = spaces.Box(low=-1, high=1, shape=(len(self.working_slice.selected_bs),), dtype=np.float16)
         self.observation_space = spaces.Discrete(101)
 
     def step(self, action):
+        info = dict()
+        info["satisfaction"] = self.compute_satisfaction()
+        info["mean_load"] = self.compute_bs_load()
+
         self.apply_action(action)
 
-        info = dict()
         info["satisfaction"] = self.compute_satisfaction()
         info["mean_load"] = self.compute_bs_load()
         new_state = int(info["satisfaction"])
@@ -285,13 +281,13 @@ class PyCREEnvC(gym.Env):
         for idx, valor in np.ndenumerate(action):
             target_bs = self.working_slice.selected_bs[idx[0]]
 
-            scaler = ScoreScaler(scores_old_min=-1, scores_old_max=1, scores_new_min=-5.0, scores_new_max=35)
+            scaler = ScoreScaler(scores_old_min=-1, scores_old_max=1, scores_new_min=10.0, scores_new_max=35)
             novo_valor = scaler.fit_transform(np.array([valor]))
 
-            if valor > 0:
-                target_bs.increase_bias(novo_valor)
-            elif valor < 0:
-                target_bs.decrease_bias(novo_valor)
+            if novo_valor[0] > 0:
+                target_bs.increase_bias(novo_valor[0], self.working_slice.cluster.ue_list)
+            elif novo_valor[0] < 0:
+                target_bs.decrease_bias(novo_valor[0])
             else:
                 target_bs.maintain_bias()
         self.working_slice.selected_bs[-1].hetnet.run(first_run_flag=False)

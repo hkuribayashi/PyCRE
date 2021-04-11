@@ -24,4 +24,4 @@ class UE:
         self._evaluation = value
 
     def __str__(self):
-        return 'UE id={}, bitrate={}, profile={}'.format(self.id, self.datarate, self.profile)
+        return 'UE id={}, bitrate={}, evaluation={}, profile={}'.format(self.id, self.datarate, self.evaluation, self.profile)

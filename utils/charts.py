@@ -180,7 +180,7 @@ def get_barchart(cluster_data, path, z=1.96):
 
         for d_ in data:
             # Get Mean and Standard Deviation
-            mean = d_.mean(axis=0)
+            mean = d_.satisfaction_growth(axis=0)
             std = d_.std(axis=0)
 
             # Append data

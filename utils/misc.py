@@ -73,7 +73,7 @@ def load_from_csv_number(path, filename, number):
 
 def consolidate_results(path, filename):
     data = pd.read_csv('{}{}'.format(path, filename), header=None, delimiter=',', sep=',')
-    return data.mean(axis=0)
+    return data.satisfaction_growth(axis=0)
 
 
 def get_k_closest_bs(ue, bs_list):
@@ -207,3 +207,10 @@ def get_pareto_evaluation(slice, solution):
     f2 = (-1) * n_bs/len(bs_list)
 
     return f1, f2
+
+
+def get_mean_load(bs_list):
+    mean = 0
+    for bs in bs_list:
+        mean += (bs.load / bs.max_load)
+    return (mean/len(bs_list)) * 100

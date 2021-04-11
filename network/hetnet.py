@@ -86,8 +86,8 @@ class HetNet:
             self.__get_ue_datarate()
 
             # Compute Performance Evaluation
-            if first_run_flag:
-                self.__get_metrics()
+            # if first_run_flag:
+            self.__get_metrics()
 
     def reset(self):
         self.network_element = list()
@@ -128,7 +128,32 @@ class HetNet:
         for coluna in map(list, zip(*self.network_element)):
             output = [element for element in coluna if element.coverage_status is True]
             bs_load = len(output)
+
             if bs_load > 0:
+                total_priority = len([x for x in output if x.ue.priority is True])
+                total_ue = bs_load
+                total_non_priority = total_ue - total_priority
+
+                teste_rb_por_ue = math.floor(output[0].bs.resouce_blocks/(total_priority * 2 + total_non_priority * 1))
+
+                output[0].bs.load = bs_load
+                rbs_per_ue = math.floor(output[0].bs.resouce_blocks / bs_load)
+                for element in output:
+                    peso = 2 if element.ue.priority is True else 1
+                    element.ue.resource_blocks = teste_rb_por_ue * peso
+
+    def __get_resource_allocation_2(self):
+        for coluna in map(list, zip(*self.network_element)):
+            output = [element for element in coluna if element.coverage_status is True]
+            bs_load = len(output)
+
+            if bs_load > 0:
+                total_priority = len([x for x in output if x.ue.priority is True])
+                total_ue = bs_load
+                total_non_priority = total_ue - total_priority
+
+                teste_rb_por_ue = output[0].bs.resouce_blocks/(total_non_priority * 2 + total_non_priority * 1)
+
                 output[0].bs.load = bs_load
                 rbs_per_ue = math.floor(output[0].bs.resouce_blocks / bs_load)
                 for element in output:
