@@ -281,7 +281,7 @@ class PyCREEnvC(gym.Env):
         for idx, valor in np.ndenumerate(action):
             target_bs = self.working_slice.selected_bs[idx[0]]
 
-            scaler = ScoreScaler(scores_old_min=-1, scores_old_max=1, scores_new_min=10.0, scores_new_max=35)
+            scaler = ScoreScaler(scores_old_min=-1, scores_old_max=1, scores_new_min=15.0, scores_new_max=42)
             novo_valor = scaler.fit_transform(np.array([valor]))
 
             if novo_valor[0] > 0:

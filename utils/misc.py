@@ -213,4 +213,5 @@ def get_mean_load(bs_list):
     mean = 0
     for bs in bs_list:
         mean += (bs.load / bs.max_load)
-    return (mean/len(bs_list)) * 100
+    result = (mean/len(bs_list)) * 100
+    return result if result > 0 else 0.01

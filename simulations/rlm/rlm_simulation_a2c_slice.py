@@ -1,4 +1,5 @@
 import os
+import sys
 import gym
 import pickle
 from stable_baselines3 import A2C
@@ -10,6 +11,10 @@ from utils.misc import get_mean_load
 user_density = 900
 n_bs = 800
 
+learning_rate = float(sys.argv[1])
+n_envs = int(sys.argv[2])
+test_mode = bool(sys.argv[3])
+
 slice_test_filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "slice_list_computed_{}_{}.obj".format(user_density, n_bs))
 filehandler = open(slice_test_filename, 'rb')
 slice_list = pickle.load(filehandler)
@@ -18,7 +23,10 @@ print("Number of Slices: {}".format(len(slice_list)))
 satisfaction = []
 load = []
 
-for id_, network_slice in enumerate(slice_list):
+lista = [2, 4, 5, 6, 7, 10, 11, 13, 15, 17, 18, 19, 20, 23, 24, 25, 26]
+
+for id_ in lista:
+    network_slice = slice_list[id_]
     mean_growth_rate_satisfaction = 0
     satisfaction_list = [network_slice.cluster.evaluation["satisfaction"]]
     load_list = [get_mean_load(network_slice.selected_bs)]
@@ -29,15 +37,15 @@ for id_, network_slice in enumerate(slice_list):
     try:
         model = A2C.load(full_path)
     except FileNotFoundError:
-        model = A2C("MlpPolicy", env, verbose=0, policy_kwargs=dict(optimizer_class=RMSpropTFLike, optimizer_kwargs=dict(eps=1e-5)))
-        model.learn(total_timesteps=2000)
+        model = A2C("MlpPolicy", env, verbose=1, learning_rate=learning_rate, n_steps=5, policy_kwargs=dict(optimizer_class=RMSpropTFLike, optimizer_kwargs=dict(eps=1e-5)))
+        model.learn(total_timesteps=5000)
         model.save(full_path)
 
     obs = env.reset()
     step = 0
 
     while step < 100:
-        action, _states = model.predict(obs, deterministic=True)
+        action, _states = model.predict(obs)
         obs, reward, done, info = env.step(action)
         satisfaction_list.append(info["satisfaction"])
         load_list.append(info["mean_load"])
@@ -53,12 +61,13 @@ for id_, network_slice in enumerate(slice_list):
     satisfaction.append(satisfaction_list)
     load.append(load_list)
 
-filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "satisfaction_list_{}_a2c_full.obj".format(user_density))
-filehandler = open(filename, 'rb')
-pickle.dump(satisfaction, filehandler)
-filehandler.close()
+if not test_mode:
+    filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "satisfaction_list_{}_a2c_full.obj".format(user_density))
+    filehandler = open(filename, 'wb')
+    pickle.dump(satisfaction, filehandler)
+    filehandler.close()
 
-filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "load_list_{}_a2c_full.obj".format(user_density))
-filehandler = open(filename, 'rb')
-pickle.dump(load, filehandler)
-filehandler.close()
+    filename = os.path.join(GlobalConfig.DEFAULT.rlm_path, "data", "load_list_{}_a2c_full.obj".format(user_density))
+    filehandler = open(filename, 'wb')
+    pickle.dump(load, filehandler)
+    filehandler.close()
